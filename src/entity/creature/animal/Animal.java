@@ -60,6 +60,7 @@ public abstract class Animal extends Creature {
 
 
     public  void decreaseSatiety(){
+        currentSatiety--;
 
     }
     public boolean isAlive(){

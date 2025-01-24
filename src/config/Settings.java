@@ -1,8 +1,10 @@
 package config;
 
 public class Settings {
+
+    int lifeCycles = 15; //Кол-во циклов
     //Жизнь острова (Длительность такта симуляции)
-    //public final static Date islandLifeCycle =
+
 
     //Размер острова
     public final static int columnsCount = 100;

@@ -11,20 +11,23 @@ import repository.PredatorFactory;
 import java.util.List;
 
 import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Location {
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class Location implements Runnable {
 
     private final List<Animal> animals = new CopyOnWriteArrayList<>(); //Список для всех животных
     private final List<Plant> plants = new CopyOnWriteArrayList<>(); //Список для растений
-
+    private ThreadLocalRandom localRandom = ThreadLocalRandom.current();
     private final Random random = new Random();
+    public int lifeCycles = 20; //Кол-во циклов
 
     public Location() {
 
         //Остров , пока что как одна локация
         Island island = new Island(Settings.columnsCount, Settings.rowsCount);
-        int lifeCycles = 15;
+
 
         //Животные на старте для 1 локации (пока что на весь остров)
         //Хищники
@@ -153,8 +156,8 @@ public class Location {
 
         }
 
-        for (int i = 0; i < Settings.maxPlantCount; i++) {
-            plants.add(new Plant());
+        for (int i = 0; i < random.nextInt(Settings.maxPlantCount)+1; i++) {
+            plants.add(new Plant(localRandom.nextDouble(1)+1));
         }
     }
 
@@ -162,6 +165,7 @@ public class Location {
         return animals;
     }
     public List<Plant> getPlants(){
+
         return plants;
     }
 
@@ -176,22 +180,30 @@ public class Location {
         }
     }
 
+    synchronized public void growPlants(){
 
+        for (int i = 0; i < localRandom.nextInt(plants.size())+1; i++) {
+            getPlants().add(new Plant(localRandom.nextDouble(1)+1));
+        }
 
-    public void AnimalAndPlantLifeCycle(){
+    }
+
+    synchronized public void animalAndPlantLifeCycle(){
         for (int i = 0; i < animals.size(); i++) {
+            animals.get(i).decreaseSatiety();
             for(int j = 0; i< animals.size();i++){
-                animals.get(i).decreaseSatiety();
                 if (animals.get(i) instanceof Predator && animals.get(j) instanceof Herbivor){
                     Predator predator = (Predator) animals.get(i);
-                    predator.eat(animals.get(j));
-                    animals.get(i).die(animals.get(j));
+                    Herbivor herbivor = (Herbivor) animals.get(j);
+                    predator.eat(herbivor);
+                    predator.die(herbivor);
 
                 }
                 else if (animals.get(i) instanceof Herbivor && animals.get(j) instanceof Predator){
+                    Herbivor herbivor = (Herbivor) animals.get(i);
                     Predator predator = (Predator) animals.get(j);
-                    predator.eat(animals.get(i));
-                    animals.get(i).die(animals.get(j));
+                    predator.eat(herbivor);
+                    predator.die(herbivor);
 
                 }
 
@@ -203,67 +215,22 @@ public class Location {
                 animals.remove(animals.get(i));
             }
         }
-        int grass= random.nextInt(10);
-        for (int i = 0; i < grass; i++) {
-            plants.add(new Plant());
-        }
 
-        System.out.println("Всего растений : " + grass);
+
+        System.out.println("Всего растений : " + getPlants());
     }
 
+    @Override
+    public void run() {
+        growPlants();
+        animalAndPlantLifeCycle();
 
-
-    public void printStatistics() {
-        long wolvesCount = animals.stream().filter(p -> p instanceof Wolf).count();
-        long boasCount = animals.stream().filter(p -> p instanceof Boa).count();
-        long foxesCount = animals.stream().filter(p -> p instanceof Fox).count();
-        long bearsCount = animals.stream().filter(p -> p instanceof Bear).count();
-        long eaglesCount = animals.stream().filter(p -> p instanceof Eagle).count();
-        long horsesCount = animals.stream().filter(p -> p instanceof Horse).count();
-        long deersCount = animals.stream().filter(p -> p instanceof Deer).count();
-        long rabbitsCount = animals.stream().filter(p -> p instanceof Rabbit).count();
-        long miceCount = animals.stream().filter(p -> p instanceof Mouse).count();
-        long goatsCount = animals.stream().filter(p -> p instanceof Goat).count();
-        long sheepsCount = animals.stream().filter(p -> p instanceof Sheep).count();
-        long boarsCount = animals.stream().filter(p -> p instanceof Bear).count();
-        long buffalosCount = animals.stream().filter(p -> p instanceof Buffalo).count();
-        long ducksCount = animals.stream().filter(p -> p instanceof Duck).count();
-        long caterpillarsCount = animals.stream().filter(p -> p instanceof Caterpillar).count();
-        long plantsCount = plants.size();
-
-
-
-        System.out.println("Статистика:");
-        System.out.println("-".repeat(100));
-        System.out.println("Animals:" + animals.size());
-        System.out.println("Хищные звери");
-        System.out.println();
-        System.out.println("Wolves: " + wolvesCount);
-        System.out.println("Boas: " + boasCount);
-        System.out.println("Foxes: " + foxesCount);
-        System.out.println("Bears: " + bearsCount);
-        System.out.println("Eagles: " + eaglesCount);
-        System.out.println();
-        System.out.println("Травоядные звери");
-        System.out.println();
-        System.out.println("Horses: " + horsesCount);
-        System.out.println("Deers: " + deersCount);
-        System.out.println("Rabbits: " + rabbitsCount);
-        System.out.println("Mice: " + miceCount);
-        System.out.println("Goats: " + goatsCount);
-        System.out.println("Sheeps: " + sheepsCount);
-        System.out.println("Boars: " + boarsCount);
-        System.out.println("Buffalos: " + buffalosCount);
-        System.out.println("Ducks: " + ducksCount);
-        System.out.println("Caterpillars: " + caterpillarsCount);
-        System.out.println("Plants: " + plantsCount);
-
-        System.out.println("-".repeat(100));
     }
-
-
-
 }
+
+
+
+
 
 
 

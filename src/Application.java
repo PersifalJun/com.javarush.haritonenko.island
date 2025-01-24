@@ -1,66 +1,68 @@
 
 import entity.Location;
+import util.Statistics;
+
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+
 
 public class Application {
+    static Statistics statistics = new Statistics();
 
 
     public static void main(String[] args) throws InterruptedException {
 
         Location location = new Location(); // Создание локации
 
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(2); // Пул на 2 потока
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(3); // Пул на 3 потока
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
-        // Вывод начальной информации
-        System.out.println("Начальная статистика:");
-        
 
-        //Вывод начального кол-ва животных и растений.
-        Map<String, Long> AnimalsInfo = location.getAnimals().
-                stream().collect(Collectors.groupingBy(animal -> animal.getClass().getSimpleName(), Collectors.counting()));
-        int plantCount = location.getPlants().size();
+        AtomicInteger cyclesQuantity = new AtomicInteger(0);
 
-        AnimalsInfo.forEach((animal, count) -> System.out.println("  " + animal + ": " + count));
-        System.out.println("Plants: " + plantCount);
-
-        int cycles = 20;   // Кол-во жизненных циклов
-        AtomicInteger cycleCounter = new AtomicInteger(0);
-
-        // Планируем задачи на каждый цикл
-        for (int i = 0; i < cycles; i++) {
-            ses.schedule(() -> {
-                if (location.getAnimals().isEmpty()) {
-                    System.out.println("Локация пуста");
-                    System.out.println("Жизнь на острове завершена " + cycleCounter.get() + " циклов.");
-                    ses.shutdown();
-                    return; // Прерываем выполнение
-                }
-
-                // Запускаем действия животных и растений в отдельных потоках
-                ses.submit(location::AnimalAndPlantLifeCycle);
-                ses.submit(location::printStatistics);
+        Runnable task = () -> {
+            ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+            // Планируем задачи на каждый цикл
+            for (int i = 0; i < location.lifeCycles; i++) {
+                ses.schedule(() -> {
+                    if (!location.getAnimals().isEmpty()) {
 
 
-                // Выводим статистику
-                location.printStatistics();
-                cycleCounter.incrementAndGet();
+                        ses.submit(location::animalAndPlantLifeCycle);
+                        ses.submit(statistics::printStatistics);
 
-                if (cycleCounter.get() >= cycles) {
-                    ses.shutdown();
-                    System.out.println("Жизнь на острове завершена " + cycles + " циклов.");
-                }
-            }, i * 5, TimeUnit.SECONDS); // Запускаем каждый цикл через 5 секунд
-        }
 
-        // Дожидаемся завершения работы executor-а
-        ses.awaitTermination(cycles * 5, TimeUnit.SECONDS);
+                        statistics.printStatistics();
+                        cyclesQuantity.incrementAndGet();
+                    }
+                    else{
+                        System.out.println("Локация пуста");
+                        System.out.println("Жизнь на острове завершена " + "совершено" + cyclesQuantity.get() + " циклов.");
+                        ses.shutdown();
+                        return; // Прерываем выполнение
+                    }
+
+                    statistics.printStatistics();
+                    cyclesQuantity.incrementAndGet();
+
+                    if (cyclesQuantity.get() >= location.lifeCycles) {
+                        ses.shutdown();
+                        System.out.println("Жизнь на острове завершена " + "совершено" + cyclesQuantity.get() + " циклов.");
+                    }
+                }, i * 5, TimeUnit.SECONDS); // Запускаем каждый цикл через 5 секунд
+            }
+
+            // Дожидаемся завершения работы executor-а
+            try {
+                ses.awaitTermination(location.lifeCycles * 5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        };
 
     }
 }

@@ -29,9 +29,13 @@ public  class Predator extends Animal {
                 double foodWeight = ((Herbivor) food).currentWeight;
                 this.currentSatiety = Math.min(FullSatiety, currentSatiety + foodWeight * 0.5);
                 this.currentWeight += foodWeight*0.1;
-            }finally {
-                lock.unlock();
+                System.out.println("Predator eat " + food.getClass().getSimpleName() + "  satiety:" + currentSatiety + " weight:" + currentWeight );
             }
+            catch(Exception e ){
+                e.printStackTrace();
+
+            }
+            lock.unlock();
 
         }
 
@@ -45,21 +49,13 @@ public  class Predator extends Animal {
 
     @Override
     public Creature reproduce() {
-        if (currentSatiety >= FullSatiety * 0.7) {
+        if (currentSatiety >= FullSatiety * 0.5) {
             currentSatiety -= FullSatiety * 0.2;
 
         }
         return new Predator(currentWeight / 2, currentSatiety / 2);
     }
 
-    /*
-    @Override
-    public Creature[] removeCreature(Creature c, Creature[] creatures) {
-        return  Arrays.stream(creatures)
-                .filter(creature -> creature != c)
-                .toArray(Creature[]::new);
-    }
-    */
     @Override
     public void die(Creature c) {
         if (this.isAlive) {
@@ -71,7 +67,7 @@ public  class Predator extends Animal {
     }
     @Override
     public void decreaseSatiety() {
-        this.currentSatiety -=1;
+        this.currentSatiety -= 0.5;
     }
 }
 

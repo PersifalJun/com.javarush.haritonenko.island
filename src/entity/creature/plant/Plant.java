@@ -2,18 +2,24 @@ package entity.creature.plant;
 
 import entity.creature.Creature;
 import entity.creature.Eatable;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
+
+
 
 public class Plant extends Creature implements Eatable {
+    Random random = new Random();
     public double weight = 1;
     int maxPlantCount = 200;
-    ThreadLocalRandom random = ThreadLocalRandom.current();
 
 
-    public Plant(){
-        this.weight = random.nextInt(1,5);
-    }
+
     public Plant(double weight){
+
+        this.weight = weight;
+    }
+
+    public void setWeight(double weight){
+
         this.weight = weight;
     }
 
