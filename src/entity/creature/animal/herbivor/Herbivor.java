@@ -22,15 +22,15 @@ public class Herbivor extends Animal {
 
 
     @Override
-    public synchronized String eat(Creature food) {
-        String eatResult = "";
+    public synchronized void eat(Creature food) {
+
         if(food instanceof Plant){
             lock.lock();
             try {
                 double foodWeight = ((Plant) food).weight;
                 this.currentSatiety = Math.min(fullSatiety, currentSatiety + foodWeight * 0.8);
                 this.currentWeight += foodWeight * 0.1;
-                eatResult = " eat: " + food.getClass().getSimpleName() + ";" + "  satiety:" + currentSatiety + " weight:" + currentWeight;
+
 
             }
             catch(Exception e ){
@@ -40,7 +40,7 @@ public class Herbivor extends Animal {
             lock.unlock();
 
         }
-        return eatResult;
+
     }
 
     @Override
@@ -91,8 +91,8 @@ public class Herbivor extends Animal {
 
     @Override
     public void decreaseSatiety() {
-        this.currentSatiety -= 1;
-        this.currentWeight  -= 0.5 ;
+        this.currentSatiety -= 0;
+        this.currentWeight  -= 0 ;
     }
 
 

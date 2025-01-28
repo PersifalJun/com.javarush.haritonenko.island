@@ -20,15 +20,14 @@ public class Predator extends Animal {
 
 
     @Override
-    public synchronized String eat(Creature food) {
-        String eatResult = "";
+    public void eat(Creature food) {
         if(food instanceof Herbivor){
             lock.lock();
             try {
                 double foodWeight = ((Herbivor) food).currentWeight;
                 this.currentSatiety = Math.min(fullSatiety, this.getCurrentWeight() + foodWeight * 0.5);
                 this.currentWeight += foodWeight*0.1;
-                eatResult = " eat " + food.getClass().getSimpleName() + ";" + " satiety:" + this.getCurrentSatiety() + " weight:" + this.getCurrentWeight();
+
             }
             catch(Exception e ){
                 e.printStackTrace();
@@ -37,7 +36,7 @@ public class Predator extends Animal {
             lock.unlock();
 
         }
-        return eatResult;
+
 
     }
 
@@ -75,7 +74,6 @@ public class Predator extends Animal {
             if ((currentWeight < maxWeight / 2 || currentSatiety <= 0 ) || (currentWeight > maxWeight && currentSatiety > fullSatiety)) {
                 dieResult = " die " + " weight:" + currentWeight;
                 this.isAlive = false;
-                location.removeAnimal((Animal) c);
             }
         }
         return dieResult;
@@ -88,8 +86,8 @@ public class Predator extends Animal {
 
     @Override
     public void decreaseSatiety() {
-        this.currentSatiety -= 1;
-        this.currentWeight -= 5;
+        this.currentSatiety -= 0;
+        this.currentWeight -= 0;
     }
 }
 

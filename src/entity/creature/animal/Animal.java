@@ -2,8 +2,7 @@ package entity.creature.animal;
 
 import entity.Location;
 import entity.creature.Creature;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -56,9 +55,8 @@ public abstract class Animal extends Creature {
 
 
 
+    public void eat(Creature food){
 
-    public String eat(Creature food){
-        return null;
     }
 
 
@@ -88,7 +86,7 @@ public abstract class Animal extends Creature {
 
 
     public  void decreaseSatiety(){
-        currentSatiety--;
+        currentSatiety-=0;
 
     }
     public boolean isAlive(){
