@@ -1,9 +1,10 @@
 
+import config.Settings;
+import entity.Island;
 import entity.Location;
 import util.Statistics;
 
 
-import java.sql.SQLOutput;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,10 +16,17 @@ public class Application {
 
     public static void main(String[] args) throws InterruptedException {
 
+
+
+        //Остров - ячейки локаций - пока не реализовано нормальным образом
+        Island island = new Island(Settings.columnsCount, Settings.rowsCount);
+        Location[][] location1 = island.getLocations();
+
+
         Location location = new Location(); // Создание локации
         Statistics statistics = new Statistics(); //Статистика
 
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(3); // Пул на 3 потока
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4); // Пул на 3 потока
 
         AtomicInteger completedCycles = new AtomicInteger(0);
 

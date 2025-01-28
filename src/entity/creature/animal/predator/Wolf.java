@@ -1,22 +1,29 @@
 package entity.creature.animal.predator;
 
 
-
+import config.Settings;
 
 public class Wolf extends Predator{
 
 
 
-    public static double maxWeight = 50;
-    private final int maxSpeed = 3;
-    public static double fullSatiety = 8;
 
 
     public Wolf(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
 
+    public double getMaxWeight(){
+        return Settings.maxWolfWeight;
+    }
 
+    public double getMaxSatiety(){
+        return Settings.WolfFullSatiety;
+    }
+
+    public double getCurrentWeight(){return currentWeight;}
+
+    public double getCurrentSatiety(){return currentSatiety;}
 
 }
 

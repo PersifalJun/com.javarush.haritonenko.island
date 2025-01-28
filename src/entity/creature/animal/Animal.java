@@ -11,52 +11,80 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Animal extends Creature {
 
     //Общие характеристики
-    double maxWeight;
     public static double currentWeight;
     public static double currentSatiety;
-    int maxSpeed;
-    protected static int FullSatiety;
+    public static double fullSatiety;
+    public static double maxWeight;
+
+    Location location;
 
     boolean isAlive = true;
     protected ReentrantLock lock = new ReentrantLock();
     protected ThreadLocalRandom random = ThreadLocalRandom.current();
 
-    // Пул потоков для параллельного выполнения
-    protected static final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
 
     public Animal(double currentWeight,double currentSatiety){
         this.currentWeight = currentWeight;
         this.currentSatiety = currentSatiety;
-    }
-    public synchronized void eat(Creature eater , Creature food,Creature[] creatures){
 
-    }
-
-
-
-
-    public abstract void eat(Creature food);
-
-    public  void move(){
 
     }
+
+    public double getCurrentWeight() {
+        return currentWeight;
+    }
+
+    public double getCurrentSatiety() {
+        return currentSatiety;
+    }
+
+    public void setCurrentWeight(double currentWeight) {
+       this.currentWeight = currentWeight;
+    }
+
+    public void setCurrentSatiety(double currentSatiety) {
+        this.currentSatiety = currentSatiety;
+    }
+
+    public  double getMaxWeight() {
+        return maxWeight;
+    }
+
+    public  double getFullSatiety() {
+        return fullSatiety;
+    }
+
+
+
+
+    public String eat(Creature food){
+        return null;
+    }
+
+
+
+    public void move(){
         //Пока не реализовано
+    }
 
-    public  Creature reproduce(){
+
+    public Animal reproduce(){
+
         return null;
     }
 
 
 
-    public void die(Creature c) {
-
+    public String die(Creature c) {
+        return null;
     }
 
+    public void selfDie(){
 
-    public Creature[] removeCreature(Creature c ,Creature[] creatures){
-        return null;
-    } //Удаление животного из-за смерти
+
+        location.removeAnimal(this);
+    }
+
 
 
     public  void decreaseSatiety(){
@@ -64,10 +92,9 @@ public abstract class Animal extends Creature {
 
     }
     public boolean isAlive(){
+
         return isAlive;
     }
 
 
-    public void eat(Location location) {
-    }
 }

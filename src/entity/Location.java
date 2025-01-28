@@ -8,6 +8,7 @@ import entity.creature.plant.Plant;
 import repository.HerbivorFactory;
 import repository.PredatorFactory;
 
+
 import java.util.List;
 
 import java.util.Random;
@@ -19,17 +20,14 @@ public class Location implements Runnable {
 
     private final List<Animal> animals = new CopyOnWriteArrayList<>(); //Список для всех животных
     private final List<Plant> plants = new CopyOnWriteArrayList<>(); //Список для растений
-    private ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+    private final ThreadLocalRandom localRandom = ThreadLocalRandom.current();
     private final Random random = new Random();
-    public int lifeCycles = 20; //Кол-во циклов
+    static Settings settings = new Settings();
+    public static int lifeCycles = settings.getLifeCycles();
+
 
     public Location() {
 
-        //Остров , пока что как одна локация
-        Island island = new Island(Settings.columnsCount, Settings.rowsCount);
-
-
-        //Животные на старте для 1 локации (пока что на весь остров)
         //Хищники
         Wolf[] wolves = new Wolf[Settings.maxWolfCount];
         Fox[] foxes = new Fox[Settings.maxFoxCount];
@@ -66,8 +64,8 @@ public class Location implements Runnable {
             animals.add(foxes[i]);
             //System.out.println(foxes[i]);
         }
-        //Создание медведей
 
+        //Создание медведей
         for (int i = 0; i < random.nextInt(Settings.maxBearCount)+1; i++) {
             bears[i] = (Bear) predatorFactory.createPredator(bears);
             animals.add(bears[i]);
@@ -120,6 +118,12 @@ public class Location implements Runnable {
             //System.out.println(horses[i]);
 
         }
+        //Создание кабанов
+        for (int i = 0; i < random.nextInt(Settings.maxHogCount)+1; i++) {
+            hogs[i] = (Hog) herbivorFactory.createHerbivor(hogs);
+            animals.add(hogs[i]);
+            //System.out.println(hogs[i]);
+        }
         //Создание коз
         for (int i = 0; i < random.nextInt(Settings.maxGoatCount)+1; i++) {
             goats[i] = (Goat) herbivorFactory.createHerbivor(goats);
@@ -162,6 +166,7 @@ public class Location implements Runnable {
     }
 
     public List<Animal> getAnimals() {
+
         return animals;
     }
     public List<Plant> getPlants(){
@@ -170,59 +175,134 @@ public class Location implements Runnable {
     }
 
 
-    public void removePlant(Plant plant) {
+    synchronized public void removePlant(Plant plant) {
         plants.remove(plant);
     }
 
-    public void removeAnimal(Animal animal) {
-        synchronized (animals) {
+    synchronized public void removeAnimal(Animal animal) {
             animals.remove(animal);
-        }
+
     }
 
-    synchronized public void growPlants(){
 
+    synchronized public void growPlants(){
         for (int i = 0; i < localRandom.nextInt(plants.size())+1; i++) {
             getPlants().add(new Plant(localRandom.nextDouble(1)+1));
         }
 
     }
 
-    synchronized public void animalAndPlantLifeCycle(){
+    public boolean checkInstanceOf(Object obj, Class<?> superClass) {
+        boolean isSubclass = superClass.isInstance(obj);
+
+        return isSubclass;
+    }
+
+
+
+
+    synchronized public void animalAndPlantLifeCycle() {
+
+        //Понижение сытости и веса за 1 жизненный цикл
         for (int i = 0; i < animals.size(); i++) {
-            animals.get(i).decreaseSatiety();
-            for(int j = 0; i< animals.size();i++){
-                if (animals.get(i) instanceof Predator && animals.get(j) instanceof Herbivor){
-                    Predator predator = (Predator) animals.get(i);
-                    Herbivor herbivor = (Herbivor) animals.get(j);
-                    predator.eat(herbivor);
-                    predator.die(herbivor);
-
-                }
-                else if (animals.get(i) instanceof Herbivor && animals.get(j) instanceof Predator){
-                    Herbivor herbivor = (Herbivor) animals.get(i);
-                    Predator predator = (Predator) animals.get(j);
-                    predator.eat(herbivor);
-                    predator.die(herbivor);
-
-                }
-
+            if (checkInstanceOf(animals.get(i), Predator.class) && !(animals.get(i).getMaxWeight()/2>=animals.get(i).getCurrentWeight()) &&
+                    !(animals.get(i).getCurrentSatiety()<=0)) {
+                Predator pr = (Predator) animals.get(i);
+                pr.decreaseSatiety();
+                System.out.println("У животного: " + animals.get(i).getClass().getSimpleName() + " вес: " + pr.getCurrentWeight() +
+                        " сытость :" + pr.getCurrentSatiety());
+            }else if (checkInstanceOf(animals.get(i), Herbivor.class) && !(animals.get(i).getMaxWeight()/2 >=animals.get(i).getCurrentWeight()) &&
+                    !(animals.get(i).getCurrentSatiety()<=0)) {
+                Herbivor hr = (Herbivor) animals.get(i);
+                hr.decreaseSatiety();
+                System.out.println("У животного: " + animals.get(i).getClass().getSimpleName() + " вес: " + hr.getCurrentWeight() +
+                        " сытость: " + hr.getCurrentSatiety());
+            }
+            else{
+                animals.get(i).selfDie();
             }
 
-            animals.get(i).reproduce();
+        }
 
-            if (!animals.get(i).isAlive()) {
-                animals.remove(animals.get(i));
+        //Механизм поедания хищником травоядного за 1 жизненный цикл - делать с вероятностью
+        for (int i = 0; i < animals.size(); i++) {
+            for (int j = 0; i < animals.size(); j++) {
+                if (checkInstanceOf(animals.get(i), Predator.class) && checkInstanceOf(animals.get(j), Herbivor.class)) {
+                    Predator predator = (Predator) animals.get(i);
+                    Herbivor herbivor = (Herbivor) animals.get(j);
+                    System.out.println(animals.get(i).getClass().getSimpleName() + "" + predator.eat(herbivor));
+                    System.out.println(animals.get(j).getClass().getSimpleName() + "" + predator.die(herbivor));
+
+                } else if (checkInstanceOf(animals.get(i), Herbivor.class) && checkInstanceOf(animals.get(j), Predator.class)) {
+                    Herbivor herbivor = (Herbivor) animals.get(i);
+                    Predator predator = (Predator) animals.get(j);
+                    System.out.println(animals.get(j).getClass().getSimpleName() + "" + predator.eat(herbivor));
+                    System.out.println(animals.get(i).getClass().getSimpleName() + "" + predator.die(herbivor));
+
+
+                }
             }
         }
 
 
-        System.out.println("Всего растений : " + getPlants());
+        //Выросли растения - делать с вероятностью
+        growPlants();
+        System.out.println("Выросли растения");
+
+
+        //Животные кушают растения - надо сделать с вероятностью
+        for (int i = 0; i < animals.size(); i++) {
+            if (checkInstanceOf(animals.get(i),Herbivor.class)){
+                Herbivor hr = (Herbivor) animals.get(i);
+                System.out.println(animals.get(i).getClass().getSimpleName() + "" + hr.eat(getPlants().get(getPlants().size())));
+                getPlants().remove(getPlants().size());
+            }
+
+
+        }
+
+        //Животные размножаются - надо сделать с вероятностью
+        for (int i = 0; i < animals.size(); i++) {
+            for (int j = 0; j < animals.size();j++){
+                if (checkInstanceOf(animals.get(i), Predator.class) && checkInstanceOf(animals.get(j), Predator.class)) {
+
+                    //Тоже сделаю рандомом кто из двоих будет вызывать reproduce
+                    Predator parentPrFirst = (Predator) animals.get(i);
+                    Predator parentPrSecond= (Predator) animals.get(j);
+                    Predator childPredator =  parentPrFirst.reproduce();
+                    if (childPredator!=null){
+                        System.out.println("Родился питомец: " + childPredator.getClass().getSimpleName() + ";" + "вес: " + childPredator.getCurrentWeight() + ";" +
+                                "сытость: " +  childPredator.getCurrentSatiety());
+
+                        animals.add(childPredator);
+                    }
+
+                }
+                else if (checkInstanceOf(animals.get(i), Herbivor.class) && checkInstanceOf(animals.get(j), Herbivor.class)){
+                    Herbivor parentHbFirst = (Herbivor) animals.get(i);
+                    Herbivor parentHbSecond= (Herbivor) animals.get(j);
+                    Herbivor childHerbivor =  parentHbFirst.reproduce();
+                    if (childHerbivor!=null){
+                        System.out.println("Родился питомец: " + childHerbivor.getClass().getSimpleName() + ";" + "вес: " + childHerbivor.getCurrentWeight() + ";" +
+                                "сытость: " +  childHerbivor.getCurrentSatiety());
+
+                        animals.add(childHerbivor);
+                    }
+                }
+
+
+            }
+        }
+
+
+        //Животные передвигаются -пока не реализовано
+
+
     }
 
     @Override
     public void run() {
-        growPlants();
+
         animalAndPlantLifeCycle();
 
     }

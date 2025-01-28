@@ -1,11 +1,9 @@
 package entity.creature.animal.predator;
 
 
+import config.Settings;
 
 public class Boa extends Predator{
-    public static double maxWeight = 15;
-    private final int maxSpeed = 1;
-    public static double fullSatiety = 3;
 
 
 
@@ -13,5 +11,16 @@ public class Boa extends Predator{
         super(currentWeight,currentSatiety);
     }
 
+    public double getMaxWeight(){
+        return Settings.maxBoaWeight;
+    }
+
+    public double getMaxSatiety(){
+        return Settings.BoaFullSatiety;
+    }
+
+    public double getCurrentWeight(){return currentWeight;}
+
+    public double getCurrentSatiety(){return currentSatiety;}
 
 }

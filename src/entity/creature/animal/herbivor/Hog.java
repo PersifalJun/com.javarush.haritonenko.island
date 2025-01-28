@@ -1,14 +1,13 @@
 package entity.creature.animal.herbivor;
 
 
+import config.Settings;
 import entity.creature.Eatable;
 
 
 
 public class Hog extends Herbivor implements Eatable {
-    public static double maxWeight = 400;
-    private final int maxSpeed = 2;
-    public static double fullSatiety = 50;
+
 
 
 
@@ -16,6 +15,17 @@ public class Hog extends Herbivor implements Eatable {
         super(currentWeight,currentSatiety);
     }
 
+    public double getMaxWeight(){
+        return Settings.maxHogWeight;
+    }
+
+    public double getMaxSatiety(){
+        return Settings.HogFullSatiety;
+    }
+
+    public double getCurrentWeight(){return currentWeight;}
+
+    public double getCurrentSatiety(){return currentSatiety;}
 
 
     @Override

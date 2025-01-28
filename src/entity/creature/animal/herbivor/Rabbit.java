@@ -1,6 +1,7 @@
 package entity.creature.animal.herbivor;
 
 
+import config.Settings;
 import entity.creature.Eatable;
 
 
@@ -8,15 +9,24 @@ import entity.creature.Eatable;
 
 public class Rabbit extends Herbivor implements Eatable {
 
-    public static double maxWeight = 2;
-    private final int maxSpeed = 2;
-    public static double fullSatiety = 0.45;
 
 
 
     public Rabbit(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
+
+    public double getMaxWeight(){
+        return Settings.maxRabbitWeight;
+    }
+
+    public double getMaxSatiety(){
+        return Settings.RabbitFullSatiety;
+    }
+
+    public double getCurrentWeight(){return currentWeight;}
+
+    public double getCurrentSatiety(){return currentSatiety;}
 
 
     @Override

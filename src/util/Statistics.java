@@ -3,12 +3,34 @@ package util;
 import entity.Location;
 import entity.creature.animal.herbivor.*;
 import entity.creature.animal.predator.*;
+import entity.creature.plant.Plant;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Statistics implements Runnable{
     Location location = new Location();
+
+
+    // Списки для статистики животных после каждого цикла
+    List<Wolf> wolfList = new ArrayList<>();
+    List<Boa> boaList = new ArrayList<>();
+    List<Fox> foxList = new ArrayList<>();
+    List<Bear> bearList = new ArrayList<>();
+    List<Eagle> eagleList = new ArrayList<>();
+    List<Horse> horseList = new ArrayList<>();
+    List<Deer> deerList = new ArrayList<>();
+    List<Rabbit> rabbitList = new ArrayList<>();
+    List<Mouse> mouseList = new ArrayList<>();
+    List<Goat> goatList = new ArrayList<>();
+    List<Sheep> sheepList = new ArrayList<>();
+    List<Hog> hogList = new ArrayList<>();
+    List<Buffalo> buffaloList = new ArrayList<>();
+    List<Duck> duckList = new ArrayList<>();
+    List<Caterpillar> caterpillarList = new ArrayList<>();
+    List<Plant> plantList = new ArrayList<>();
 
     public void printStatistics() {
 
@@ -50,6 +72,7 @@ public class Statistics implements Runnable{
 
         System.out.println("-".repeat(100));
     }
+
 
 
     @Override
