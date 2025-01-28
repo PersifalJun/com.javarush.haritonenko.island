@@ -22,9 +22,6 @@ public class Deer extends Herbivor implements Eatable{
         return Settings.DeerFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
-
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
 

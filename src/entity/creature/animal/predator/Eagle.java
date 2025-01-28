@@ -20,9 +20,7 @@ public class Eagle extends Predator{
         return Settings.EagleFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
 }

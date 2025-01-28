@@ -24,12 +24,6 @@ public class Buffalo extends Herbivor implements Eatable {
     }
 
 
-    public double getCurrentWeight(){return currentWeight;}
-
-    public double getCurrentSatiety(){return currentSatiety;}
-
-
-
 
 
 

@@ -91,8 +91,8 @@ public class Herbivor extends Animal {
 
     @Override
     public void decreaseSatiety() {
-        this.currentSatiety -= 2;
-        this.currentWeight  -= 5 ;
+        this.currentSatiety -= 1;
+        this.currentWeight  -= 0.5 ;
     }
 
 

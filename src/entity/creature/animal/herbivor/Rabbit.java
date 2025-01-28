@@ -24,9 +24,7 @@ public class Rabbit extends Herbivor implements Eatable {
         return Settings.RabbitFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
     @Override

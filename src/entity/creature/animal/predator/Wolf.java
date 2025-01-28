@@ -21,9 +21,7 @@ public class Wolf extends Predator{
         return Settings.WolfFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 }
 

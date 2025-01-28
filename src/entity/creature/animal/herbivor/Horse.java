@@ -21,9 +21,7 @@ public class Horse extends Herbivor implements Eatable {
         return Settings.HorseFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
     @Override
     public void beEaten() {

@@ -19,8 +19,6 @@ public class Boa extends Predator{
         return Settings.BoaFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 }

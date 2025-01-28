@@ -24,9 +24,7 @@ public class Caterpillar extends Herbivor implements Eatable {
         return Settings.CaterpillarFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
     @Override
     public void beEaten() {

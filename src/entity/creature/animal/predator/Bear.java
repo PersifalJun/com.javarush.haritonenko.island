@@ -16,10 +16,7 @@ public class Bear extends Predator{
         return Settings.maxBearWeight;
     }
 
-    @Override
-    public double getCurrentWeight(){return currentWeight;}
-    @Override
-    public double getCurrentSatiety(){return currentSatiety;}
+
 
 
     public double getMaxSatiety(){

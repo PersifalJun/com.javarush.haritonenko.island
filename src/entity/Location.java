@@ -226,7 +226,7 @@ public class Location implements Runnable {
 
         //Механизм поедания хищником травоядного за 1 жизненный цикл - делать с вероятностью
         for (int i = 0; i < animals.size(); i++) {
-            for (int j = 0; i < animals.size(); j++) {
+            for (int j = 0; j < animals.size(); j++) {
                 if (checkInstanceOf(animals.get(i), Predator.class) && checkInstanceOf(animals.get(j), Herbivor.class)) {
                     Predator predator = (Predator) animals.get(i);
                     Herbivor herbivor = (Herbivor) animals.get(j);

@@ -20,9 +20,7 @@ public class Fox extends Predator{
         return Settings.FoxFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
 }

@@ -23,9 +23,7 @@ public class Goat extends Herbivor implements Eatable {
         return Settings.GoatFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
 

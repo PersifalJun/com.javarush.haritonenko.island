@@ -24,9 +24,7 @@ public class Sheep extends Herbivor implements Eatable {
         return Settings.SheepFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
     @Override

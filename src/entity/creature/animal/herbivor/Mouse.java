@@ -22,9 +22,6 @@ public class Mouse extends Herbivor implements Eatable {
         return Settings.MouseFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
-
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
     @Override

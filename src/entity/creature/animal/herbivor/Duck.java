@@ -23,9 +23,7 @@ public class Duck extends Herbivor implements Eatable {
         return Settings.DuckFullSatiety;
     }
 
-    public double getCurrentWeight(){return currentWeight;}
 
-    public double getCurrentSatiety(){return currentSatiety;}
 
 
     @Override
