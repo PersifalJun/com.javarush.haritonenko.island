@@ -14,12 +14,12 @@ public class Duck extends Herbivor implements Eatable {
     public Duck(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
-
+    @Override
     public double getMaxWeight(){
         return Settings.maxDuckWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.DuckFullSatiety;
     }
 

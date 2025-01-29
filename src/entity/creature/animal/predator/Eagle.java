@@ -11,12 +11,12 @@ public class Eagle extends Predator{
     public Eagle(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
-
+    @Override
     public double getMaxWeight(){
         return Settings.maxEagleWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.EagleFullSatiety;
     }
 

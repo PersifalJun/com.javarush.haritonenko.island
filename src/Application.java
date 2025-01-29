@@ -26,7 +26,7 @@ public class Application {
         Location location = new Location(); // Создание локации
         Statistics statistics = new Statistics(); //Статистика
 
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4); // Пул на 3 потока
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(6); // Пул на 3 потока
 
         AtomicInteger completedCycles = new AtomicInteger(0);
 
@@ -48,10 +48,10 @@ public class Application {
             }
             };
 
-            Runnable statisticsTask = statistics::run;
+            //Runnable statisticsTask = statistics::run;
 
             ses.scheduleAtFixedRate(locationTask, 0, 5, TimeUnit.SECONDS); // Запуск каждую секунду
-            ses.scheduleAtFixedRate(statisticsTask, 1, 5, TimeUnit.SECONDS); // Запуск статистики каждую секунду со смещением
+            //ses.scheduleAtFixedRate(statisticsTask, 1, 5, TimeUnit.SECONDS); // Запуск статистики каждую секунду со смещением
 
 
                 //жидание завершения всех задач

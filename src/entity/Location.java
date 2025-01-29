@@ -9,6 +9,7 @@ import repository.HerbivorFactory;
 import repository.PredatorFactory;
 
 
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -162,9 +163,7 @@ public class Location implements Runnable {
 
         }
 
-        for (int i = 0; i < random.nextInt(Settings.maxPlantCount) + 1; i++) {
-            plants.add(new Plant(localRandom.nextDouble(1) + 1));
-        }
+
     }
 
     public List<Animal> getAnimals() {
@@ -178,14 +177,6 @@ public class Location implements Runnable {
     }
 
 
-    synchronized public void removePlant(Plant plant) {
-        plants.remove(plant);
-    }
-
-    synchronized public void removeAnimal(Animal animal) {
-        animals.remove(animal);
-
-    }
 
 
     synchronized public void growPlants() {
@@ -202,34 +193,50 @@ public class Location implements Runnable {
     }
 
 
-    synchronized public void animalAndPlantLifeCycle() {
 
-        // Понижение сытости и веса за 1 жизненный цикл
+
+    //Спавн животных :
+    synchronized public void animalsSpawn(){
+
+        System.out.println("Произошел спавн животных");
         Iterator<Animal> iterator = animals.iterator();
         while (iterator.hasNext()) {
             Animal animal = iterator.next();
-            animal.decreaseSatiety();
+            System.out.println("Животное: " + animal.getClass().getSimpleName() +
+                    " | Вес: " + animal.getCurrentWeight() +
+                    " | Сытость: " + animal.getCurrentSatiety());
 
-            if (animal.getCurrentSatiety() <= 0 && animal.getCurrentWeight() < animal.getMaxWeight() / 2) {
-                System.out.println(animal.getClass().getSimpleName() + " погиб от истощения.");
-                iterator.remove();
-            } else {
-                System.out.println("Животное: " + animal.getClass().getSimpleName() +
-                        " | Вес: " + animal.getCurrentWeight() +
-                        " | Сытость: " + animal.getCurrentSatiety());
+        }
+    }
+
+    synchronized public void lostSatiety(){
+        // Понижение сытости и веса за 1 жизненный цикл
+        Iterator<Animal> iterator = animals.iterator();
+        System.out.println("Произошла потеря сытости");
+        while (iterator.hasNext()) {
+            Animal beast = iterator.next();
+            beast.decreaseSatiety();
+            if (beast.getCurrentSatiety() <= 0 && beast.getCurrentWeight() < beast.getMaxWeight() / 2) {
+                System.out.println(beast.getClass().getSimpleName() + " погиб от истощения.");
+                iterator.remove();                          //Удаление данного объекта
+            }
+            else {
+                System.out.println("Животное: " + beast.getClass().getSimpleName() +
+                        " | Текущий вес: " + beast.getCurrentWeight() +
+                        " | Текущая сытость: " + beast.getCurrentSatiety());
             }
         }
+    }
 
-
+    synchronized public void predatorHunting(){                         //Добавить вероятность
+        Iterator<Animal> iterator = animals.iterator();
         // Хищники охотятся на травоядных с вероятностью
-        List<Animal> newAnimals = new ArrayList<>();
-        iterator = animals.iterator();
         while (iterator.hasNext()) {
             Animal predator = iterator.next();
             if (predator instanceof Predator) {
                 for (Animal prey : animals) {
                     if (prey instanceof Herbivor && random.nextDouble(0,1) < 0.3) { // 30% вероятность поедания - пока что так
-                        ((Predator) predator).eat(prey);
+                        (predator).eat(prey);
                         System.out.println(predator.getClass().getSimpleName() + " съел " + prey.getClass().getSimpleName() +
                                 "; " + " satiety:" + predator.getCurrentSatiety() + " weight:" + predator.getCurrentWeight());
                         iterator.remove();
@@ -238,23 +245,36 @@ public class Location implements Runnable {
                 }
             }
         }
+    }
 
-        // Выросли растения (вероятность 50%)
-        if (random.nextDouble() < 0.5) {
+    synchronized public void plantsIsHere(){
+        Iterator<Animal> iterator = animals.iterator();
             growPlants();
             System.out.println("Выросли растения.");
-        }
 
-        // Травоядные едят растения (вероятность 70%) - пока что так
-        iterator = animals.iterator();
+    }
+
+    synchronized public void herbivorsEating(){                     // Травоядные едят растения (вероятность 100%)
+
+        Iterator<Animal> iterator = animals.iterator();
         while (iterator.hasNext()) {
             Animal herbivore = iterator.next();
-            if (herbivore instanceof Herbivor && !getPlants().isEmpty() && random.nextDouble() < 0.7) {
+            if (herbivore instanceof Herbivor && !getPlants().isEmpty()) {
                 Plant plant = getPlants().remove(getPlants().size() - 1);
-                ((Herbivor) herbivore).eat(plant);
-                System.out.println(herbivore.getClass().getSimpleName() + " съел растение.");
+                (herbivore).eat(plant);
+                 System.out.println(herbivore.getClass().getSimpleName() + " съел растение." + " Осталось растений на локации: "+ getPlants().size());
             }
         }
+    }
+
+
+
+
+    synchronized public void animalAndPlantLifeCycle() {
+
+
+
+        List<Animal> newAnimals = new ArrayList<>();
 
         // Размножение животных (вероятность 25%)
         for (int i = 0; i < animals.size(); i++) {
@@ -279,8 +299,13 @@ public class Location implements Runnable {
 
     @Override
     public void run() {
+        plantsIsHere();
+        animalsSpawn();
+        herbivorsEating();
+        lostSatiety();
+        predatorHunting();
 
-        animalAndPlantLifeCycle();
+        //animalAndPlantLifeCycle();
 
     }
 }

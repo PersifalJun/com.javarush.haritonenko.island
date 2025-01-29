@@ -12,12 +12,12 @@ public class Horse extends Herbivor implements Eatable {
     public Horse(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
-
+    @Override
     public double getMaxWeight(){
         return Settings.maxHorseWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.HorseFullSatiety;
     }
 

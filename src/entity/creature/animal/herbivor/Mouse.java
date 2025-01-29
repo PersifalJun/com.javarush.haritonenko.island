@@ -14,11 +14,12 @@ public class Mouse extends Herbivor implements Eatable {
     public Mouse(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
+    @Override
     public double getMaxWeight(){
         return Settings.maxMouseWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.MouseFullSatiety;
     }
 

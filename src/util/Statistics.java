@@ -43,6 +43,7 @@ public class Statistics implements Runnable{
         int plantCount = location.getPlants().size();
 
         AnimalsInfo.forEach((animal, count) -> System.out.println("  " + animal + ": " + count));
+
         System.out.println("Plants: " + plantCount);
 
         System.out.println("Статистика:");

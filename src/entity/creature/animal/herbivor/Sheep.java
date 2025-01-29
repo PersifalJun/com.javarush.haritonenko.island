@@ -15,12 +15,12 @@ public class Sheep extends Herbivor implements Eatable {
     public Sheep(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
-
+    @Override
     public double getMaxWeight(){
         return Settings.maxSheepWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.SheepFullSatiety;
     }
 

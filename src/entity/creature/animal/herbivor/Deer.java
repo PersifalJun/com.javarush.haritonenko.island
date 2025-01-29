@@ -13,12 +13,12 @@ public class Deer extends Herbivor implements Eatable{
     public Deer(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
-
+    @Override
     public double getMaxWeight(){
         return Settings.maxDeerWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.DeerFullSatiety;
     }
 

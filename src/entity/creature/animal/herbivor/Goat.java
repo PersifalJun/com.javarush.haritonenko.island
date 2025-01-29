@@ -15,11 +15,13 @@ public class Goat extends Herbivor implements Eatable {
         super(currentWeight,currentSatiety);
     }
 
+    @Override
     public double getMaxWeight(){
         return Settings.maxGoatWeight;
     }
 
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.GoatFullSatiety;
     }
 

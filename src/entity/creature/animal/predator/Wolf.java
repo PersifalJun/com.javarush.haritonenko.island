@@ -13,11 +13,12 @@ public class Wolf extends Predator{
         super(currentWeight,currentSatiety);
     }
 
+    @Override
     public double getMaxWeight(){
         return Settings.maxWolfWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.WolfFullSatiety;
     }
 

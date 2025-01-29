@@ -10,10 +10,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Animal extends Creature {
 
     //Общие характеристики
-    public  double currentWeight;
-    public  double currentSatiety;
-    public  double fullSatiety;
-    public  double maxWeight;
+    public double currentWeight;
+    public double currentSatiety;
+    public double fullSatiety;
+    public double maxWeight;
 
     Location location;
 
@@ -77,16 +77,10 @@ public abstract class Animal extends Creature {
         return null;
     }
 
-    public void selfDie(){
-
-
-        location.removeAnimal(this);
-    }
-
-
 
     public  void decreaseSatiety(){
         currentSatiety-=0;
+        currentWeight-=0;
 
     }
     public boolean isAlive(){

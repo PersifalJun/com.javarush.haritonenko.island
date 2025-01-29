@@ -13,10 +13,13 @@ public class Predator extends Animal {
     public double maxWeight;
     boolean isAlive = true;
     Location location;
+
+
     public Predator(double currentWeight,double currentSatiety){
         super(currentWeight,currentSatiety);
 
     }
+
 
 
     @Override
@@ -79,10 +82,6 @@ public class Predator extends Animal {
         return dieResult;
     }
 
-    public void selfDie(){
-
-        location.removeAnimal(this);
-    }
 
     @Override
     public void decreaseSatiety() {

@@ -11,12 +11,12 @@ public class Fox extends Predator{
     public Fox(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
     }
-
+    @Override
     public double getMaxWeight(){
         return Settings.maxFoxWeight;
     }
-
-    public double getMaxSatiety(){
+    @Override
+    public double getFullSatiety(){
         return Settings.FoxFullSatiety;
     }
 
