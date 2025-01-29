@@ -164,6 +164,7 @@ public class Location implements Runnable {
         }
 
 
+
     }
 
     public List<Animal> getAnimals() {
@@ -177,21 +178,12 @@ public class Location implements Runnable {
     }
 
 
-
-
-    synchronized public void growPlants() {
-        for (int i = 0; i < localRandom.nextInt(plants.size()) + 1; i++) {
-            getPlants().add(new Plant(localRandom.nextDouble(1) + 1));
+    public void growPlants() {
+        for (int i = 0; i < localRandom.nextInt(Settings.maxPlantCount) + 1; i++) {
+            plants.add(new Plant(localRandom.nextDouble(1) + 1));
         }
-
+        System.out.println("Выросли растения: " + getPlants().size());
     }
-
-    public boolean checkInstanceOf(Object obj, Class<?> superClass) {
-        boolean isSubclass = superClass.isInstance(obj);
-
-        return isSubclass;
-    }
-
 
 
 
@@ -228,31 +220,45 @@ public class Location implements Runnable {
         }
     }
 
-    synchronized public void predatorHunting(){                         //Добавить вероятность
-        Iterator<Animal> iterator = animals.iterator();
-        // Хищники охотятся на травоядных с вероятностью
-        while (iterator.hasNext()) {
-            Animal predator = iterator.next();
-            if (predator instanceof Predator) {
-                for (Animal prey : animals) {
-                    if (prey instanceof Herbivor && random.nextDouble(0,1) < 0.3) { // 30% вероятность поедания - пока что так
-                        (predator).eat(prey);
-                        System.out.println(predator.getClass().getSimpleName() + " съел " + prey.getClass().getSimpleName() +
-                                "; " + " satiety:" + predator.getCurrentSatiety() + " weight:" + predator.getCurrentWeight());
-                        iterator.remove();
+    synchronized public void predatorHunting() {
+        List<Animal> predatorsToRemove = new ArrayList<>();
+        List<Animal> preyToRemove = new ArrayList<>();
 
+        for (Animal predator : new ArrayList<>(animals)) { // Используем копию списка
+            if (predator instanceof Predator) {
+                for (Animal prey : new ArrayList<>(animals)) {
+                    if (prey instanceof Herbivor) {
+                        int probability = Predator.getProbability(predator.getClass(), prey.getClass());
+                        System.out.println(predator.getClass().getSimpleName() + " пытается съесть " + prey.getClass().getSimpleName() +
+                                " (вероятность " + probability + "%)");
+
+                        if (localRandom.nextInt(100) < probability) { // Проверяем вероятность охоты
+                            predator.eat(prey); // Хищник ест жертву
+                            System.out.println(predator.getClass().getSimpleName() + " съел " +
+                                    prey.getClass().getSimpleName() +
+                                    "; satiety: " +  predator.getCurrentSatiety() +
+                                    "; weight: " + predator.getCurrentWeight());
+
+                            preyToRemove.add(prey); // Отмечаем жертву для удаления
+                        }
                     }
+                }
+
+                // Если хищник переел — сразу убираем его из цикла
+                if (((Predator) predator).isOverfed()) {
+                    System.out.println(predator.getClass().getSimpleName() + " умер от переедания!");
+                    predatorsToRemove.add(predator);
+                    continue; // Пропускаем дальнейшую охоту для умершего хищника
                 }
             }
         }
+
+        // Удаляем животных после цикла
+        animals.removeAll(preyToRemove);
+        animals.removeAll(predatorsToRemove);
     }
 
-    synchronized public void plantsIsHere(){
-        Iterator<Animal> iterator = animals.iterator();
-            growPlants();
-            System.out.println("Выросли растения.");
 
-    }
 
     synchronized public void herbivorsEating(){                     // Травоядные едят растения (вероятность 100%)
 
@@ -262,24 +268,18 @@ public class Location implements Runnable {
             if (herbivore instanceof Herbivor && !getPlants().isEmpty()) {
                 Plant plant = getPlants().remove(getPlants().size() - 1);
                 (herbivore).eat(plant);
-                 System.out.println(herbivore.getClass().getSimpleName() + " съел растение." + " Осталось растений на локации: "+ getPlants().size());
+                System.out.println(herbivore.getClass().getSimpleName() + " съел растение." + " Осталось растений на локации: "+ getPlants().size());
             }
         }
     }
 
-
-
-
-    synchronized public void animalAndPlantLifeCycle() {
-
-
-
+    synchronized public void animalReproduce(){
         List<Animal> newAnimals = new ArrayList<>();
 
-        // Размножение животных (вероятность 25%)
+        // Размножение животных (вероятность 25%) - пока что убрал
         for (int i = 0; i < animals.size(); i++) {
             for (int j = i + 1; j < animals.size(); j++) {
-                if (animals.get(i).getClass().equals(animals.get(j).getClass()) && random.nextDouble() < 0.25) {
+                if (animals.get(i).getClass().equals(animals.get(j).getClass())) {
                     Animal parent1 = animals.get(i);
                     Animal child = parent1.reproduce();
                     if (child != null && animals.size() < 10) {
@@ -293,27 +293,28 @@ public class Location implements Runnable {
         animals.addAll(newAnimals);
 
 
+    }
 
+
+
+
+    public void animalAndPlantLifeCycle() {
+
+        growPlants();
+        animalsSpawn();
+        herbivorsEating();
+        lostSatiety();
+        predatorHunting();
+        //animalReproduce();
+        System.out.println();
+        System.out.println("-".repeat(100));
 
     }
 
     @Override
     public void run() {
-        plantsIsHere();
-        animalsSpawn();
-        herbivorsEating();
-        lostSatiety();
-        predatorHunting();
 
-        //animalAndPlantLifeCycle();
+        animalAndPlantLifeCycle();
 
     }
 }
-
-
-
-
-
-
-
-

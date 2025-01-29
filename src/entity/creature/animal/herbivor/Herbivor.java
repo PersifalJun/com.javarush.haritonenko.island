@@ -4,7 +4,6 @@ package entity.creature.animal.herbivor;
 import entity.Location;
 import entity.creature.Creature;
 import entity.creature.animal.Animal;
-import entity.creature.animal.predator.Predator;
 import entity.creature.plant.Plant;
 
 
@@ -19,7 +18,13 @@ public class Herbivor extends Animal {
 
         super(currentWeight, currentSatiety);
     }
+    public double getCurrentWeight() {
+        return currentWeight;
+    }
 
+    public double getCurrentSatiety() {
+        return currentSatiety;
+    }
 
     @Override
     public synchronized void eat(Creature food) {
@@ -61,10 +66,6 @@ public class Herbivor extends Animal {
             return null;
         }
 
-        /*if (currentSatiety >= FullSatiety * 0.5) {
-            currentSatiety -= FullSatiety * 0.2;
-
-         */
         }
 
 

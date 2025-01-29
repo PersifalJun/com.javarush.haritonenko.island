@@ -26,14 +26,14 @@ public class Application {
         Location location = new Location(); // Создание локации
         Statistics statistics = new Statistics(); //Статистика
 
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(6); // Пул на 3 потока
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4); // Пул на n потоков
 
         AtomicInteger completedCycles = new AtomicInteger(0);
 
         Runnable locationTask = () -> {
             ThreadLocalRandom localRandom = ThreadLocalRandom.current();
             // Планируем задачи на каждый цикл
-            for (int i = 0; i < location.lifeCycles; i++) {
+            for (int i = 0; i <location.lifeCycles; i++) {
                 if (!location.getAnimals().isEmpty()) {
                     location.run();
                     completedCycles.incrementAndGet();

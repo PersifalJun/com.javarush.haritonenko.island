@@ -10,8 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Animal extends Creature {
 
     //Общие характеристики
-    public double currentWeight;
-    public double currentSatiety;
+    protected double currentWeight;
+    protected double currentSatiety;
     public double fullSatiety;
     public double maxWeight;
 
