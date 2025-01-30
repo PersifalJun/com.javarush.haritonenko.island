@@ -5,13 +5,14 @@ import config.Settings;
 import entity.creature.Eatable;
 
 
-public class Buffalo extends Herbivor implements Eatable {
+public class Buffalo extends Herbivor {
 
 
 
 
     public Buffalo(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
+        setSpecies("Buffalo");
     }
 
     @Override
@@ -28,10 +29,5 @@ public class Buffalo extends Herbivor implements Eatable {
 
 
 
-
-    @Override
-    public void beEaten() {
-        //die();
-    }
 
 }

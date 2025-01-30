@@ -1,83 +1,64 @@
 package util;
 
-import entity.Location;
-import entity.creature.animal.herbivor.*;
-import entity.creature.animal.predator.*;
+import entity.creature.animal.Animal;
 import entity.creature.plant.Plant;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public class Statistics implements Runnable{
-    Location location = new Location();
+public class Statistics {
 
+    private int totalAnimals; // Общее количество животных
+    private int totalPlants;  // Общее количество растений
+    private Map<Class<? extends Animal>, Integer> animalsCount; // Счетчик для каждого вида животных
 
-    // Списки для статистики животных после каждого цикла
-    List<Wolf> wolfList = new ArrayList<>();
-    List<Boa> boaList = new ArrayList<>();
-    List<Fox> foxList = new ArrayList<>();
-    List<Bear> bearList = new ArrayList<>();
-    List<Eagle> eagleList = new ArrayList<>();
-    List<Horse> horseList = new ArrayList<>();
-    List<Deer> deerList = new ArrayList<>();
-    List<Rabbit> rabbitList = new ArrayList<>();
-    List<Mouse> mouseList = new ArrayList<>();
-    List<Goat> goatList = new ArrayList<>();
-    List<Sheep> sheepList = new ArrayList<>();
-    List<Hog> hogList = new ArrayList<>();
-    List<Buffalo> buffaloList = new ArrayList<>();
-    List<Duck> duckList = new ArrayList<>();
-    List<Caterpillar> caterpillarList = new ArrayList<>();
-    List<Plant> plantList = new ArrayList<>();
-
-    public void printStatistics() {
-
-        // Вывод начальной информации
-        System.out.println("Начальная статистика:");
-
-        //Вывод начального кол-ва животных и растений.
-        Map<String, Long> AnimalsInfo = location.getAnimals().
-                stream().collect(Collectors.groupingBy(animal -> animal.getClass().getSimpleName(), Collectors.counting()));
-        int plantCount = location.getPlants().size();
-
-        AnimalsInfo.forEach((animal, count) -> System.out.println("  " + animal + ": " + count));
-
-        System.out.println("Plants: " + plantCount);
-
-        System.out.println("Статистика:");
-        System.out.println("-".repeat(100));
-        System.out.println("Animals:" + location.getAnimals().size());
-        System.out.println("Хищные звери");
-        System.out.println();
-        System.out.println("Wolves: " + location.getAnimals().stream().filter(p -> p instanceof Wolf).count());
-        System.out.println("Boas: " + location.getAnimals().stream().filter(p -> p instanceof Boa).count());
-        System.out.println("Foxes: " + location.getAnimals().stream().filter(p -> p instanceof Fox).count());
-        System.out.println("Bears: " + location.getAnimals().stream().filter(p -> p instanceof Bear).count());
-        System.out.println("Eagles: " + location.getAnimals().stream().filter(p -> p instanceof Eagle).count());
-        System.out.println();
-        System.out.println("Травоядные звери");
-        System.out.println();
-        System.out.println("Horses: " + location.getAnimals().stream().filter(p -> p instanceof Horse).count());
-        System.out.println("Deers: " + location.getAnimals().stream().filter(p -> p instanceof Deer).count());
-        System.out.println("Rabbits: " + location.getAnimals().stream().filter(p -> p instanceof Rabbit).count());
-        System.out.println("Mice: " + location.getAnimals().stream().filter(p -> p instanceof Mouse).count());
-        System.out.println("Goats: " + location.getAnimals().stream().filter(p -> p instanceof Goat).count());
-        System.out.println("Sheeps: " + location.getAnimals().stream().filter(p -> p instanceof Sheep).count());
-        System.out.println("Buffalos: " + location.getAnimals().stream().filter(p -> p instanceof Buffalo).count());
-        System.out.println("Hogs: " + location.getAnimals().stream().filter(p -> p instanceof Hog).count());
-        System.out.println("Ducks: " + location.getAnimals().stream().filter(p -> p instanceof Duck).count());
-        System.out.println("Caterpillars: " + location.getAnimals().stream().filter(p -> p instanceof Caterpillar).count());
-        System.out.println("Plants: " + location.getPlants().size());
-
-        System.out.println("-".repeat(100));
+    public Statistics() {
+        totalAnimals = 0;
+        totalPlants = 0;
+        animalsCount = new HashMap<>();
     }
 
+    // Метод для обновления статистики животных
+    public void updateAnimals(List<Animal> animals) {
+        totalAnimals = animals.size(); // Обновляем общее количество животных
 
+        // Обновляем количество каждого вида животных
+        animalsCount.clear();
+        for (Animal animal : animals) {
+            Class<? extends Animal> animalClass = animal.getClass();
+            animalsCount.put(animalClass, animalsCount.getOrDefault(animalClass, 0) + 1);
+        }
+    }
 
-    @Override
-    public void run() {
-        printStatistics();
+    // Метод для обновления статистики растений
+    public void updatePlants(List<Plant> plants) {
+        totalPlants = plants.size(); // Обновляем общее количество растений
+    }
+
+    // Метод для вывода статистики
+    public void printStatistics() {
+        System.out.println("Общее количество животных: " + totalAnimals);
+        System.out.println("Общее количество растений: " + totalPlants);
+
+        // Выводим количество каждого вида животных
+        System.out.println("Количество животных по видам:");
+        for (Map.Entry<Class<? extends Animal>, Integer> entry : animalsCount.entrySet()) {
+            System.out.println(entry.getKey().getSimpleName() + ": " + entry.getValue());
+        }
+        System.out.println("-".repeat(100)); // Разделитель
+    }
+
+    // Геттеры
+    public int getTotalAnimals() {
+        return totalAnimals;
+    }
+
+    public int getTotalPlants() {
+        return totalPlants;
+    }
+
+    public Map<Class<? extends Animal>, Integer> getAnimalsCount() {
+        return animalsCount;
     }
 }

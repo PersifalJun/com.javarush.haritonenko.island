@@ -7,12 +7,13 @@ import entity.creature.Eatable;
 
 
 
-public class Goat extends Herbivor implements Eatable {
+public class Goat extends Herbivor {
 
 
 
     public Goat(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
+        setSpecies("Goat");
     }
 
     @Override
@@ -29,10 +30,7 @@ public class Goat extends Herbivor implements Eatable {
 
 
 
-    @Override
-    public void beEaten() {
-        //die();
-    }
+
 
 }
 

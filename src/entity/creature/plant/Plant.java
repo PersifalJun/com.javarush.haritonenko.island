@@ -1,13 +1,12 @@
 package entity.creature.plant;
 
-import config.Settings;
+
 import entity.creature.Creature;
-import entity.creature.Eatable;
-import java.util.Random;
 
 
 
-public class Plant extends Creature implements Eatable {
+
+public class Plant extends Creature  {
 
     public double weight;
 
@@ -18,12 +17,7 @@ public class Plant extends Creature implements Eatable {
         this.weight = weight;
     }
 
-    public double getWeight() {
-        return Settings.maxPlantWeight;
-    }
 
-    @Override
-    public void beEaten() {
 
-    }
+
 }

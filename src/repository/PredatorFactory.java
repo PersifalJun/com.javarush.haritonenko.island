@@ -18,25 +18,30 @@ public class PredatorFactory extends Predator  {
     }
 
 
-    public Predator createPredator(Predator[] p){
-        if (p instanceof Wolf[]){
-            return new Wolf(random.nextDouble(Settings.maxWolfWeight/2,Settings.maxWolfWeight),random.nextDouble(Settings.WolfFullSatiety)+1);
+    public Predator createPredator(Class<? extends Predator> predatorType) {
+        if (predatorType.equals(Wolf.class)) {
+            return new Wolf(random.nextDouble(Settings.maxWolfWeight / 2, Settings.maxWolfWeight),
+                    random.nextDouble(Settings.WolfFullSatiety) + 1);
         }
-        else if (p instanceof Eagle[]){
-            return new Eagle(random.nextDouble(Settings.maxEagleWeight/2,Settings.maxEagleWeight),random.nextDouble(Settings.EagleFullSatiety)+1);
+        else if (predatorType.equals(Eagle.class)) {
+            return new Eagle(random.nextDouble(Settings.maxEagleWeight / 2, Settings.maxEagleWeight),
+                    random.nextDouble(Settings.EagleFullSatiety) + 1);
         }
-        else if (p instanceof Boa[]){
-            return new Boa(random.nextDouble(Settings.maxBoaWeight/2,Settings.maxBoaWeight),random.nextDouble(Settings.BoaFullSatiety)+1);
+        else if (predatorType.equals(Boa.class)) {
+            return new Boa(random.nextDouble(Settings.maxBoaWeight / 2, Settings.maxBoaWeight),
+                    random.nextDouble(Settings.BoaFullSatiety) + 1);
         }
-        else if (p instanceof Bear[]) {
-            return new Bear(random.nextDouble(Settings.maxBearWeight/2,Settings.maxBearWeight),random.nextDouble(Settings.BearFullSatiety)+1);
+        else if (predatorType.equals(Bear.class)) {
+            return new Bear(random.nextDouble(Settings.maxBearWeight / 2, Settings.maxBearWeight),
+                    random.nextDouble(Settings.BearFullSatiety) + 1);
+        }
+        else if (predatorType.equals(Fox.class)) {
+            return new Fox(random.nextDouble(Settings.maxFoxWeight / 2, Settings.maxFoxWeight),
+                    random.nextDouble(Settings.FoxFullSatiety) + 1);
         }
         else {
-            return new Fox(random.nextDouble(Settings.maxFoxWeight/2,Settings.maxFoxWeight),random.nextDouble(Settings.FoxFullSatiety)+1);
-
+            throw new IllegalArgumentException("Unknown predator type");
         }
-
-
     }
 
 }

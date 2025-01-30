@@ -1,73 +1,92 @@
-
 import config.Settings;
 import entity.Island;
 import entity.Location;
-import util.Statistics;
 
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 public class Application {
 
     public static void main(String[] args) throws InterruptedException {
 
+        Island island = new Island(Settings.columnsCount, Settings.rowsCount); // остров
+        island.createLocations(); //Создаие локаций
+        Location[][] location1 = island.getLocations(); // Инициализация массива локаций
 
 
-        //Остров - ячейки локаций - пока не реализовано нормальным образом
-        Island island = new Island(Settings.columnsCount, Settings.rowsCount);
-        Location[][] location1 = island.getLocations();
 
+        // Пул потоков
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4); // 4 ядра
 
-        Location location = new Location(); // Создание локации
-        Statistics statistics = new Statistics(); //Статистика
+        // Латч для ожидания завершения всех потоков
+        CountDownLatch latch = new CountDownLatch(Settings.columnsCount * Settings.rowsCount);
 
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4); // Пул на n потоков
-
+        // Для корректного увеличения цисла циклов
         AtomicInteger completedCycles = new AtomicInteger(0);
 
-        Runnable locationTask = () -> {
-            ThreadLocalRandom localRandom = ThreadLocalRandom.current();
-            // Планируем задачи на каждый цикл
-            for (int i = 0; i <location.lifeCycles; i++) {
-                if (!location.getAnimals().isEmpty()) {
-                    location.run();
-                    completedCycles.incrementAndGet();
+        // Запуск обработки локаций по порядку (по одной каждую 3 секунды)
+        for (int i = 0; i < Settings.columnsCount; i++) {
+            for (int j = 0; j < Settings.rowsCount; j++) {
+                final int column = i;
+                final int row = j;
+
+                // Локация для текущего потока
+                final Location location = location1[i][j];
 
 
-                } else {
-                    System.out.println("Локация пуста");
-                    System.out.println("Жизнь на острове завершена " + "совершено" + completedCycles.get() + " циклов.");
-                    ses.shutdown();
-                    return; // Прерываем выполнение
-                }
-            }
-            };
-
-            //Runnable statisticsTask = statistics::run;
-
-            ses.scheduleAtFixedRate(locationTask, 0, 5, TimeUnit.SECONDS); // Запуск каждую секунду
-            //ses.scheduleAtFixedRate(statisticsTask, 1, 5, TimeUnit.SECONDS); // Запуск статистики каждую секунду со смещением
-
-
-                //жидание завершения всех задач
-                ses.schedule(() -> {
-                    ses.shutdown();
+                // Задача для каждой локации
+                Runnable locationTask = () -> {
                     try {
-                        if (!ses.awaitTermination(10, TimeUnit.SECONDS)) {
-                            System.err.println("Некоторые задачи не успели завершиться вовремя");
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("Все задачи завершены");
-                }, location.lifeCycles * 5L, TimeUnit.SECONDS);
-            };
+                        int totalCycles = location.lifeCycles;
+                        AtomicInteger localCompletedCycles = new AtomicInteger(0);
 
+                        // Выполнение жизненного цикла для локации
+                        for (int cycle = 0; cycle < totalCycles; cycle++) {
+                            if (!location.getAnimals().isEmpty()) {
+                                location.run(); // Запуск жизненного цикла
+                                localCompletedCycles.incrementAndGet();
+                            } else {
+                                System.out.println("Локация [" + column + ", " + row + "] пуста.");
+                                break; // Прерывание, если в локации нет животных
+                            }
+                        }
+
+                        // Вывод результата для текущей локации
+                        System.out.println("Локация [" + column + ", " + row + "] завершила " + localCompletedCycles.get() + " циклов.");
+                        completedCycles.addAndGet(localCompletedCycles.get());
+
+                        // Уменьшаем латч, чтобы обозначить завершение задачи для этой локации
+                        latch.countDown();
+
+                        // Задержка 3 секунды перед выводом следующей локации
+                        Thread.sleep(3000); // Задержка 3 секунды (3000 миллисекунд)
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); // В случае прерывания потока
+                    }
+                };
+
+                // Запускаем задачу для текущей локации в последовательном потоке
+                ses.submit(locationTask);
+            }
         }
 
+        // Ожидание завершения всех задач
+        if (!latch.await(15, TimeUnit.SECONDS)) {
+            System.err.println("Некоторые задачи не успели завершиться вовремя");
+        }
 
+        // Завершаем работу пула потоков
+        ses.shutdown();
+
+        // Проверка завершения всех задач
+        if (!ses.awaitTermination(10, TimeUnit.SECONDS)) {
+            System.err.println("Некоторые задачи не завершились вовремя");
+        } else {
+            System.out.println("Все задачи завершены.");
+        }
+
+        // Итоговая статистика
+        System.out.println("Общее количество завершенных циклов для всех локаций: " + completedCycles.get());
+    }
+}

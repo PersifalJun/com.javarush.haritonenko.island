@@ -7,12 +7,13 @@ import entity.creature.Eatable;
 
 
 
-public class Duck extends Herbivor implements Eatable {
+public class Duck extends Herbivor  {
 
 
 
     public Duck(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
+        setSpecies("Duck");
     }
     @Override
     public double getMaxWeight(){
@@ -26,8 +27,5 @@ public class Duck extends Herbivor implements Eatable {
 
 
 
-    @Override
-    public void beEaten() {
-        //die();
-    }
+
 }

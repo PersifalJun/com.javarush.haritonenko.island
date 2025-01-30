@@ -7,12 +7,13 @@ import entity.creature.Eatable;
 
 
 
-public class Mouse extends Herbivor implements Eatable {
+public class Mouse extends Herbivor  {
 
 
 
     public Mouse(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
+        setSpecies("Mouse");
     }
     @Override
     public double getMaxWeight(){
@@ -25,9 +26,6 @@ public class Mouse extends Herbivor implements Eatable {
 
 
 
-    @Override
-    public void beEaten() {
-        //die();
-    }
+
 }
 
