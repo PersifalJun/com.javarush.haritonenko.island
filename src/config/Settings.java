@@ -11,15 +11,15 @@ import java.util.Map;
 
 public class Settings {
 
-    public final static int lifeCycles = 15; //Кол-во циклов
+    public final static int lifeCycles = 2; //Кол-во циклов
 
     public int getLifeCycles() {
         return lifeCycles;
     }
 
     //Размер острова
-    public final static int columnsCount = 4;           //Можно менять и ставить 100
-    public final static int rowsCount = 4;              //Можно менять и ставить 20 , но будет очень долгий вывод
+    public final static int columnsCount = 2;           //Можно менять и ставить 100
+    public final static int rowsCount = 2;              //Можно менять и ставить 20 , но будет очень долгий вывод
 
     // Характеристики для растений на 1 локации
     public final static int maxPlantCount = 200;
@@ -89,8 +89,8 @@ public class Settings {
     public static final int maxCountAnimals = maxWolfCount + maxFoxCount + maxBearCount + maxBoaCount+
               maxEagleCount + maxSheepCount + maxRabbitCount +
              maxMouseCount + maxHorseCount + maxHogCount+
-            + maxGoatCount + maxDuckCount + maxDeerCount+
-            + maxBuffaloCount + maxCaterpillarCount;
+             maxGoatCount + maxDuckCount + maxDeerCount+
+             maxBuffaloCount + maxCaterpillarCount;
 
     public static final int capacity = maxCountAnimals + maxPlantCount;
 
@@ -148,22 +148,42 @@ public class Settings {
 
 
     //Кол-во детенышей у каждого животного - в доработке
-    public final static int maxWolfСubCount = 1;
-    public final static int maxFoxCubCount = 1;
-    public final static int maxEagleCubCount = 1;
-    public final static int maxBoaCubCount = 1;
-    public final static int maxBearCubCount = 1;
-    public final static int maxSheepCubCount = 1;
-    public final static int maxRabbitCubCount = 1;
-    public final static int maxMouseCubCount = 1;
-    public final static int maxHorseCubCount = 1;
-    public final static int maxHogCubCount = 1;
-    public final static int maxGoatCubCount = 1;
-    public final static int maxDuckCubCount = 1;
-    public final static int maxDeerCubCount = 1;
-    public final static int maxCaterpillarCubCount = 1;
-    public final static int maxBuffaloCubCount = 1;
+    public final static int maxWolfCubCount = 10;
+    public final static int maxFoxCubCount = 10;
+    public final static int maxEagleCubCount = 10;
+    public final static int maxBoaCubCount = 10;
+    public final static int maxBearCubCount = 10;
+    public final static int maxSheepCubCount = 10;
+    public final static int maxRabbitCubCount = 10;
+    public final static int maxMouseCubCount = 10;
+    public final static int maxHorseCubCount = 10;
+    public final static int maxHogCubCount = 10;
+    public final static int maxGoatCubCount = 10;
+    public final static int maxDuckCubCount = 10;
+    public final static int maxDeerCubCount = 10;
+    public final static int maxCaterpillarCubCount = 10;
+    public final static int maxBuffaloCubCount = 10;
 
+    // Метод для получения максимального количества детенышей для каждого вида
+    public static int getMaxCubCount(Class<? extends Animal> animalClass) {
+        if (animalClass.equals(Wolf.class)) return maxWolfCubCount;
+        if (animalClass.equals(Fox.class)) return maxFoxCubCount;
+        if (animalClass.equals(Eagle.class)) return maxEagleCubCount;
+        if (animalClass.equals(Boa.class)) return maxBoaCubCount;
+        if (animalClass.equals(Bear.class)) return maxBearCubCount;
+        if (animalClass.equals(Sheep.class)) return maxSheepCubCount;
+        if (animalClass.equals(Rabbit.class)) return maxRabbitCubCount;
+        if (animalClass.equals(Mouse.class)) return maxMouseCubCount;
+        if (animalClass.equals(Horse.class)) return maxHorseCubCount;
+        if (animalClass.equals(Hog.class)) return maxHogCubCount;
+        if (animalClass.equals(Goat.class)) return maxGoatCubCount;
+        if (animalClass.equals(Duck.class)) return maxDuckCubCount;
+        if (animalClass.equals(Deer.class)) return maxDeerCubCount;
+        if (animalClass.equals(Caterpillar.class)) return maxCaterpillarCubCount;
+        if (animalClass.equals(Buffalo.class)) return maxBuffaloCubCount;
+
+        return 0; // по умолчанию, если вид не найден
+    }
 
 
 

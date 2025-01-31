@@ -12,10 +12,7 @@ import repository.HerbivorFactory;
 
 public class Herbivor extends Animal {
 
-    boolean isAlive = true;
-    public double maxWeight;
 
-    Location location;
 
     public Herbivor(double currentWeight, double currentSatiety) {
 
@@ -91,10 +88,6 @@ public class Herbivor extends Animal {
         }
     }
 
-    @Override
-    public void move(){
-       //пока не реализовано
-    }
 
 
     @Override
@@ -113,8 +106,6 @@ public class Herbivor extends Animal {
 
 
     }
-
-
 
 
 

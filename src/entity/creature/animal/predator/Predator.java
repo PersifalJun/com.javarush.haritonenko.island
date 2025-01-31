@@ -12,11 +12,6 @@ import repository.PredatorFactory;
 public class Predator extends Animal {
 
 
-    /*public double maxWeight;
-    boolean isAlive = true;
-    */
-    Location location;
-
 
     public Predator(double currentWeight,double currentSatiety){
         super(currentWeight,currentSatiety);
@@ -81,10 +76,7 @@ public class Predator extends Animal {
     }
 
 
-    @Override
-    public void move(){
-        //Пока не реализовано + добавлю рандом перехода животных на новую локу
-    }
+
 
     @Override
     public Predator reproduce() {

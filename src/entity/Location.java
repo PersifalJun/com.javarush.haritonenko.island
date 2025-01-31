@@ -449,6 +449,7 @@ public class Location implements Runnable {
         Map<Class<? extends Animal>, Integer> animalCounts = new HashMap<>();
         System.out.println("Размножение");
 
+        // Подсчитываем количество животных каждого типа
         for (Animal animal : animals) {
             animalCounts.put(animal.getClass(), animalCounts.getOrDefault(animal.getClass(), 0) + 1);
         }
@@ -470,8 +471,8 @@ public class Location implements Runnable {
                     int currentCount = animalCounts.get(parent1.getClass()); // Текущее количество животных данного типа
 
                     // Если текущее количество животных меньше максимального, проверяем шанс на размножение
-                    if (currentCount < maxCount) {
-                        if (Math.random() < 0.25) { // Шанс на размножение 25%
+                    if (currentCount < maxCount || Math.random() < 0.5) { // 50% шанс, что животные смогут размножиться, даже если лимит близок
+                        if (Math.random() < 1.0) { // Для отладки: 100% шанс на размножение
                             Animal child = null;
 
                             // Размножение в зависимости от типа животного
@@ -485,18 +486,33 @@ public class Location implements Runnable {
                             if (child != null) {
                                 int childCount = animalCounts.getOrDefault(child.getClass(), 0);
 
+                                // Получаем максимальное количество детенышей для этого вида
+                                int maxCubs = Settings.getMaxCubCount(child.getClass());
+
                                 // Проверяем лимит для потомков
-                                if (childCount < Settings.getMaxCount(child.getClass())) {
+                                if (childCount < maxCubs || Math.random() < 0.5) {  // 50% шанс на размножение даже если лимит близок
                                     newAnimals.add(child); // Добавляем детеныша в список
                                     animalCounts.put(child.getClass(), childCount + 1); // Увеличиваем количество животных этого типа
                                     alreadyReproduced.add(parent1); // Помечаем родителей как размножившихся
                                     alreadyReproduced.add(parent2);
+                                    // Привязываем детеныша к текущей локации родителя
+                                    child.setLocation(parent1.getLocation());
+
+                                    // Логируем создание нового животного
                                     System.out.println("Родился новый " + child.getClass().getSimpleName() +
                                             " | Вес: " + child.getCurrentWeight() +
                                             " | Сытость: " + child.getCurrentSatiety());
+                                } else {
+                                    System.out.println("Лимит для " + child.getClass().getSimpleName() + " достигнут.");
                                 }
+                            } else {
+                                System.out.println("Не удалось создать детеныша.");
                             }
+                        } else {
+                            System.out.println("Животные не размножаются в этом цикле.");
                         }
+                    } else {
+                        System.out.println("Текущее количество " + parent1.getClass().getSimpleName() + " уже достигло максимума.");
                     }
                 }
             }
@@ -510,6 +526,7 @@ public class Location implements Runnable {
         for (Map.Entry<Class<? extends Animal>, Integer> entry : animalCounts.entrySet()) {
             System.out.println(entry.getKey().getSimpleName() + ": " + entry.getValue());
         }
+
     }
 
     public void animalsMove() {

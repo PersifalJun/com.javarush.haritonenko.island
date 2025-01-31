@@ -35,60 +35,52 @@ public abstract class Animal extends Creature implements Cloneable{
 
     }
     public void move() {
-        // 50% вероятность того, что животное перейдет на другую локацию
+        // 50% вероятность того, что животное переместится
         if (ThreadLocalRandom.current().nextDouble() < 0.5) {
-            // Получаем список соседних локаций (например, смежные клетки)
-            Location newLocation = findNewLocation();
-
+            Location newLocation = findNewLocation(); // Ищем соседнюю локацию
 
             if (newLocation != null) {
-
-                List<Animal> animalsOnNewLocation = newLocation.getAnimals();
-                int speciesCount = 0;
-
-                for (Animal animal : animalsOnNewLocation) {
-                    if (animal.getSpecies().equals(this.species)) {
-                        speciesCount++;
-                    }
-                }
-
-
-                if (newLocation.getCapacity() > animalsOnNewLocation.size() && speciesCount < newLocation.getMaxSpeciesCount(this.species)) {
-
+                // Если место на локации есть, животное перемещается
+                if (newLocation.getCapacity() > newLocation.getAnimals().size()) {
+                    // Убираем животное с текущей локации
                     this.location.removeAnimal(this);
 
+                    // Устанавливаем новую локацию для животного
+                    this.setLocation(newLocation);
 
-                    Animal clonedAnimal = this.clone();
-                    clonedAnimal.setLocation(newLocation);
+                    // Добавляем животное на новую локацию
+                    newLocation.addAnimal(this);
 
-
-                    newLocation.addAnimal(clonedAnimal);
-
-
-                    System.out.println(this.species + " переместилось из локации [" + this.location.getCoordinates() + "] в локацию [" + newLocation.getCoordinates() + "] с скоростью " + this.speed);
+                    // Логируем перемещение
+                    System.out.println(this.species + " переместилось в локацию [" + newLocation.getCoordinates() + "]");
                 } else {
-
-                    System.out.println(this.species + " не может переместиться. На локации [" + newLocation.getCoordinates() + "] слишком много животных этого вида или локация переполнена.");
+                    // Если на новой локации нет места
+                    System.out.println(this.species + " не может переместиться. Локация переполнена.");
                 }
+            } else {
+                // Если не удалось найти соседнюю локацию
+                System.out.println(this.species + " не может найти соседнюю локацию.");
             }
         } else {
+            // Если животное не решило перемещаться
             System.out.println(this.species + " не переместилось.");
         }
     }
-
     private Location findNewLocation() {
+        // Генерация случайных сдвигов в пределах скорости животного
         int dx = ThreadLocalRandom.current().nextInt(-speed, speed + 1);
         int dy = ThreadLocalRandom.current().nextInt(-speed, speed + 1);
 
-
+        // Получаем соседнюю локацию с учетом сдвигов
         Location newLocation = this.location.getAdjacentLocation(dx, dy);
-
-        if (newLocation == null) {
-            System.out.println("Не удалось найти соседнюю локацию для перемещения.");
-        }
 
         return newLocation;
     }
+
+
+
+
+
 
 
     // Метод, возвращающий скорость животного в зависимости от его вида
