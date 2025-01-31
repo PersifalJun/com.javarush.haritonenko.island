@@ -5,10 +5,9 @@ import config.Settings;
 import entity.Location;
 import entity.creature.Creature;
 import entity.creature.animal.Animal;
-import entity.creature.animal.predator.*;
 import entity.creature.plant.Plant;
 import repository.HerbivorFactory;
-import repository.PredatorFactory;
+
 
 
 public class Herbivor extends Animal {

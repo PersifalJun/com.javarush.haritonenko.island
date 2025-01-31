@@ -6,8 +6,6 @@ import config.Settings;
 public class Eagle extends Predator{
 
 
-
-
     public Eagle(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
         setSpecies("Eagle");
@@ -20,8 +18,6 @@ public class Eagle extends Predator{
     public double getFullSatiety(){
         return Settings.EagleFullSatiety;
     }
-
-
 
 
 }

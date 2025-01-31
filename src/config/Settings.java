@@ -40,7 +40,7 @@ public class Settings {
     public final static int maxGoatCount = 140;
     public final static int maxDuckCount = 200;
     public final static int maxDeerCount = 20;
-    public final static int maxCaterpillarCount = 100; // Вообще их 1000 но в консоли очень много выводится;
+    public final static int maxCaterpillarCount = 50; // Вообще их 1000 но в консоли очень много выводится;
     public final static int maxBuffaloCount = 10;
 
 
@@ -91,6 +91,8 @@ public class Settings {
              maxMouseCount + maxHorseCount + maxHogCount+
             + maxGoatCount + maxDuckCount + maxDeerCount+
             + maxBuffaloCount + maxCaterpillarCount;
+
+    public static final int capacity = maxCountAnimals + maxPlantCount;
 
     //Максимальный вес каждого животного :
     public final static double maxWolfWeight = 50;

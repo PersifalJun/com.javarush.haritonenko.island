@@ -30,9 +30,10 @@ public class Location implements Runnable {
     private int capacity; // Вместимость локации
     private int x, y; // Координаты локации
 
-    public Location(int x,int y) {
+    public Location(int x,int y, int capacity) {
         this.x=x;
         this.y=y;
+        this.capacity = capacity;
 
         //Хищники
         Wolf[] wolves = new Wolf[Settings.maxWolfCount];
@@ -169,33 +170,41 @@ public class Location implements Runnable {
 
     }
 
-    // Метод для добавления животного
     public void addAnimal(Animal clonedAnimal) {
-        lock.lock(); // Блокируем ресурсы для синхронизации
+        lock.lock();
         try {
-            if (animals.size() < capacity) {
-                animals.add(clonedAnimal); // Добавляем животное
+            System.out.println("До добавления животного. Количество животных: " + animals.size());
+
+            if (animals.size() < capacity || capacity == 0) {
+                animals.add(clonedAnimal);
                 clonedAnimal.setLocation(this); // Устанавливаем локацию для животного
-                System.out.println(clonedAnimal.getSpecies() + " добавлено в локацию [" + x + ", " + y + "]");
+
+                System.out.println("После добавления животного. Количество животных: " + animals.size());
+
+                // Обновление статистики
+                statistics.updateAnimals(animals);
             } else {
-                System.out.println("Локация [" + x + ", " + y + "] переполнена. Не удается добавить животное.");
+                System.out.println("Локация переполнена.");
             }
         } finally {
-            lock.unlock(); // Разблокируем ресурсы
+            lock.unlock();
         }
     }
 
-    // Метод для удаления животного
     public void removeAnimal(Animal animal) {
-        lock.lock(); // Блокируем ресурсы для синхронизации
+        lock.lock();
         try {
-            if (animals.remove(animal)) { // Удаляем животное
-                System.out.println(animal.getSpecies() + " удалено из локации [" + x + ", " + y + "]");
+            System.out.println("До удаления животного. Количество животных: " + animals.size());
+
+            if (animals.remove(animal)) {
+                statistics.updateAnimals(animals); // Обновляем статистику
             } else {
-                System.out.println(animal.getSpecies() + " не найдено в локации [" + x + ", " + y + "]");
+                System.out.println("Животное не найдено.");
             }
+
+            System.out.println("После удаления животного. Количество животных: " + animals.size());
         } finally {
-            lock.unlock(); // Разблокируем ресурсы
+            lock.unlock();
         }
     }
     // Метод для получения вместимости
@@ -212,7 +221,7 @@ public class Location implements Runnable {
     // Метод для получения соседней локации
     public Location getAdjacentLocation(int dx, int dy) {
         // Например, просто создаем новую локацию с изменением координат
-        return new Location(this.x + dx, this.y + dy);
+        return new Location(this.x + dx, this.y + dy,capacity);
     }
 
     // Дополнительные методы
@@ -221,7 +230,6 @@ public class Location implements Runnable {
     }
 
     public List<Animal> getAnimals() {
-
         return animals;
     }
 
@@ -231,23 +239,21 @@ public class Location implements Runnable {
     }
 
 
-    // Выращивание растений с ограничением на максимальное количество
+
     public void growPlants() {
-        // Ограничение на количество растений
         int currentPlantCount = plants.size();
         int maxPlants = Settings.maxPlantCount;
 
-        // Добавляем растения, если текущее количество меньше максимума
         if (currentPlantCount < maxPlants) {
             for (int i = 0; i < Math.min(localRandom.nextInt(Settings.maxPlantCount) + 1, maxPlants - currentPlantCount); i++) {
                 plants.add(new Plant(localRandom.nextDouble(1) + 1));
             }
+            statistics.updatePlants(plants); // Обновляем статистику растений
             System.out.println("Выросли растения: " + getPlants().size());
         } else {
             System.out.println("Достигнут лимит растений на локации.");
         }
     }
-
 
 
     // Спавн животных с ограничением на максимальное количество
@@ -423,9 +429,9 @@ public class Location implements Runnable {
                 }
 
                 // Проверка на переедание (если сытость больше, чем на 10% превышена)
-                if (herbivore.getCurrentSatiety() > herbivore.getFullSatiety() * 1.1) { // 10% превышение
+                if (herbivore.getCurrentSatiety() > herbivore.getFullSatiety() * 1.1) {
                     System.out.println(herbivore.getClass().getSimpleName() + " переел и умер!");
-                    toRemove.add(herbivore); // Добавляем травоядное в список на удаление
+                    toRemove.add(herbivore);
                 }
             }
         }
@@ -510,11 +516,15 @@ public class Location implements Runnable {
         lock.lock(); // Блокируем ресурсы для синхронизации
         try {
             System.out.println("Перемещение животных на локации [" + this.getCoordinates() + "]...");
-            // Перемещаем каждого животного на локации
+
+            // Перемещаем каждого животного на локации с учетом его скорости
             for (Animal animal : animals) {
                 if (animal.isAlive()) {
+                    // Логируем передвижение животного
                     System.out.println("Животное с видом " + animal.getSpecies() + " на локации [" + this.getCoordinates() + "] перемещается...");
-                    animal.move(); // Вызываем move для каждого животного
+
+                    // Перемещаем животное с учетом его скорости
+                    animal.move();
                 }
             }
         } finally {
@@ -532,7 +542,7 @@ public class Location implements Runnable {
         growPlants();
         System.out.println();
         animalsSpawn();
-        System.out.println("Всего животных: "+ getAnimals().size());
+
         System.out.println();
         herbivorsEating();
         System.out.println();
@@ -544,18 +554,17 @@ public class Location implements Runnable {
         animalReproduce();
         System.out.println();
         animalsMove();
-        System.out.println("Осталось растений: " + getPlants().size());
-        System.out.println("Осталось животных: " + getAnimals().size());
         System.out.println("Прошел день жизни");
 
 
         // Вывод статистики
-        statistics.printStatistics();
+        statistics.printDailyStatistics(getAnimals());
+
 
         System.out.println();
         System.out.println("-".repeat(100));
-        System.out.println();
-        System.out.println("-".repeat(100));
+
+
 
     }
 

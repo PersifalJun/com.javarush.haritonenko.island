@@ -3,7 +3,7 @@ package entity.creature.animal.herbivor;
 
 
 import config.Settings;
-import entity.creature.Eatable;
+
 
 
 public class Caterpillar extends Herbivor {

@@ -25,7 +25,4 @@ public class Bear extends Predator{
         return Settings.BearFullSatiety;
     }
 
-
-
-
 }

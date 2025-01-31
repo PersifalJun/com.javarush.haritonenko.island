@@ -1,7 +1,11 @@
 package util;
 
+
 import entity.creature.animal.Animal;
 import entity.creature.plant.Plant;
+import entity.creature.animal.herbivor.*;
+import entity.creature.animal.predator.*;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,25 +13,22 @@ import java.util.Map;
 
 public class Statistics {
 
-    private int totalAnimals; // Общее количество животных
-    private int totalPlants;  // Общее количество растений
-    private Map<Class<? extends Animal>, Integer> animalsCount; // Счетчик для каждого вида животных
+    private Map<Class<? extends Animal>, Integer> animalCounts; // Количество животных по видам
+    private int totalPlants; // Общее количество растений
 
     public Statistics() {
-        totalAnimals = 0;
-        totalPlants = 0;
-        animalsCount = new HashMap<>();
+        this.animalCounts = new HashMap<>();
+        this.totalPlants = 0;
     }
 
-    // Метод для обновления статистики животных
     public void updateAnimals(List<Animal> animals) {
-        totalAnimals = animals.size(); // Обновляем общее количество животных
+        // Очищаем предыдущую статистику
+        animalCounts.clear();
 
-        // Обновляем количество каждого вида животных
-        animalsCount.clear();
+        // Обновляем статистику по каждому виду животных
         for (Animal animal : animals) {
             Class<? extends Animal> animalClass = animal.getClass();
-            animalsCount.put(animalClass, animalsCount.getOrDefault(animalClass, 0) + 1);
+            animalCounts.put(animalClass, animalCounts.getOrDefault(animalClass, 0) + 1);
         }
     }
 
@@ -36,29 +37,34 @@ public class Statistics {
         totalPlants = plants.size(); // Обновляем общее количество растений
     }
 
-    // Метод для вывода статистики
-    public void printStatistics() {
-        System.out.println("Общее количество животных: " + totalAnimals);
+    // Метод для вывода статистики по количеству животных на конец дня
+    public void printDailyStatistics(List<Animal> animals) {
+        System.out.println("==== Статистика  на конец дня ====");
+        System.out.println("Осталось животных:" + animals.size());
+        System.out.println("Хищные звери");
+        System.out.println();
+        System.out.println("Wolves: " + animals.stream().filter(p -> p instanceof Wolf).count());
+        System.out.println("Boas: " +animals.stream().filter(p -> p instanceof Boa).count());
+        System.out.println("Foxes: " + animals.stream().filter(p -> p instanceof Fox).count());
+        System.out.println("Bears: " +animals.stream().filter(p -> p instanceof Bear).count());
+        System.out.println("Eagles: " +animals.stream().filter(p -> p instanceof Eagle).count());
+        System.out.println();
+        System.out.println("Травоядные звери");
+        System.out.println();
+        System.out.println("Horses: " + animals.stream().filter(p -> p instanceof Horse).count());
+        System.out.println("Deers: " + animals.stream().filter(p -> p instanceof Deer).count());
+        System.out.println("Rabbits: " + animals.stream().filter(p -> p instanceof Rabbit).count());
+        System.out.println("Mice: " + animals.stream().filter(p -> p instanceof Mouse).count());
+        System.out.println("Goats: " + animals.stream().filter(p -> p instanceof Goat).count());
+        System.out.println("Sheeps: " + animals.stream().filter(p -> p instanceof Sheep).count());
+        System.out.println("Hogs: " + animals.stream().filter(p -> p instanceof Hog).count());
+        System.out.println("Buffalos: " + animals.stream().filter(p -> p instanceof Buffalo).count());
+        System.out.println("Ducks: " + animals.stream().filter(p -> p instanceof Duck).count());
+        System.out.println("Caterpillars: " + animals.stream().filter(p -> p instanceof Caterpillar).count());
+        System.out.println("-".repeat(100));
         System.out.println("Общее количество растений: " + totalPlants);
-
-        // Выводим количество каждого вида животных
-        System.out.println("Количество животных по видам:");
-        for (Map.Entry<Class<? extends Animal>, Integer> entry : animalsCount.entrySet()) {
-            System.out.println(entry.getKey().getSimpleName() + ": " + entry.getValue());
-        }
-        System.out.println("-".repeat(100)); // Разделитель
+        System.out.println("-".repeat(50));
     }
 
-    // Геттеры
-    public int getTotalAnimals() {
-        return totalAnimals;
-    }
 
-    public int getTotalPlants() {
-        return totalPlants;
-    }
-
-    public Map<Class<? extends Animal>, Integer> getAnimalsCount() {
-        return animalsCount;
-    }
 }

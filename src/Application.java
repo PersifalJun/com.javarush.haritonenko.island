@@ -11,9 +11,9 @@ public class Application {
     public static void main(String[] args) throws InterruptedException {
 
         Island island = new Island(Settings.columnsCount, Settings.rowsCount); // остров
+
         island.createLocations(); //Создаие локаций
         Location[][] location1 = island.getLocations(); // Инициализация массива локаций
-
 
 
         // Пул потоков
@@ -35,34 +35,50 @@ public class Application {
                 final Location location = location1[i][j];
 
 
-                // Задача для каждой локации
                 Runnable locationTask = () -> {
                     try {
-                        int totalCycles = location.lifeCycles;
+                        int totalCycles = location.lifeCycles; // Получаем количество циклов из настроек локации
                         AtomicInteger localCompletedCycles = new AtomicInteger(0);
+
+                        System.out.println("Запуск циклов для локации [" + column + ", " + row + "] с " + totalCycles + " циклами.");
 
                         // Выполнение жизненного цикла для локации
                         for (int cycle = 0; cycle < totalCycles; cycle++) {
+                            System.out.println("Цикл " + cycle + " для локации [" + column + ", " + row + "]...");
+
+                            // Проводим цикл только если есть живые животные
                             if (!location.getAnimals().isEmpty()) {
-                                location.run(); // Запуск жизненного цикла
+                                // Проверка, все ли животные мертвы
+                                boolean allDead = location.getAnimals().stream().allMatch(animal -> !animal.isAlive());
+
+                                if (allDead) {
+                                    // Если все животные мертвы, останавливаем программу
+                                    System.out.println("Все животные на локации [" + column + ", " + row + "] мертвы. Завершаем выполнение программы.");
+                                    System.out.println("Общее количество завершенных циклов: " + completedCycles.get());
+
+                                }
+
+                                location.run();  // Выполнение всех действий для животных в локации
                                 localCompletedCycles.incrementAndGet();
+                                System.out.println("Цикл " + cycle + " завершен.");
                             } else {
-                                System.out.println("Локация [" + column + ", " + row + "] пуста.");
-                                break; // Прерывание, если в локации нет животных
+                                break; // Если локация пуста, завершаем выполнение циклов
                             }
                         }
 
-                        // Вывод результата для текущей локации
-                        System.out.println("Локация [" + column + ", " + row + "] завершила " + localCompletedCycles.get() + " циклов.");
-                        completedCycles.addAndGet(localCompletedCycles.get());
+                        // Результат для текущей локации, только если были выполнены циклы с живыми животными
+                        if (localCompletedCycles.get() > 0) {
+                            System.out.println("Локация [" + column + ", " + row + "] завершила " + localCompletedCycles.get() + " циклов.");
+                            completedCycles.addAndGet(localCompletedCycles.get());
+                        }
 
-                        // Уменьшаем латч, чтобы обозначить завершение задачи для этой локации
+                        // Уменьшаем латч, обозначая завершение задачи для этой локации
                         latch.countDown();
 
-                        // Задержка 3 секунды перед выводом следующей локации
-                        Thread.sleep(3000); // Задержка 3 секунды (3000 миллисекунд)
+                        // Задержка перед выводом следующей локации (можно исключить если не требуется)
+                        Thread.sleep(3000);
                     } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt(); // В случае прерывания потока
+                        Thread.currentThread().interrupt();
                     }
                 };
 

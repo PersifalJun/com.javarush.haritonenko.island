@@ -16,8 +16,9 @@ public abstract class Animal extends Creature implements Cloneable{
     protected double currentSatiety;
     public double fullSatiety;
     public double maxWeight;
-    private String species; // Вид животного
+    private String species =""; // Вид животного
     private Location location; // Текущая локация животного
+    private int speed;
 
 
 
@@ -29,6 +30,7 @@ public abstract class Animal extends Creature implements Cloneable{
     public Animal(double currentWeight,double currentSatiety){
         this.currentWeight = currentWeight;
         this.currentSatiety = currentSatiety;
+        this.speed = getSpeedForSpecies(species);
 
 
     }
@@ -38,62 +40,95 @@ public abstract class Animal extends Creature implements Cloneable{
             // Получаем список соседних локаций (например, смежные клетки)
             Location newLocation = findNewLocation();
 
-            // Если такая локация существует, проверяем условия
+
             if (newLocation != null) {
-                // Получаем список животных на новой локации и их виды
+
                 List<Animal> animalsOnNewLocation = newLocation.getAnimals();
                 int speciesCount = 0;
 
-                // Подсчитываем количество животных этого вида на новой локации
                 for (Animal animal : animalsOnNewLocation) {
                     if (animal.getSpecies().equals(this.species)) {
                         speciesCount++;
                     }
                 }
 
-                // Проверяем, не превышает ли количество животных на локации ограничение
+
                 if (newLocation.getCapacity() > animalsOnNewLocation.size() && speciesCount < newLocation.getMaxSpeciesCount(this.species)) {
-                    // Удаляем животное из старой локации
+
                     this.location.removeAnimal(this);
 
-                    // Создаем клон животного для новой локации
+
                     Animal clonedAnimal = this.clone();
                     clonedAnimal.setLocation(newLocation);
 
-                    // Добавляем животное в новую локацию
+
                     newLocation.addAnimal(clonedAnimal);
 
-                    // Логирование перемещения
-                    System.out.println(this.species + " переместилось из локации [" + this.location.getCoordinates() + "] в локацию [" + newLocation.getCoordinates() + "]");
+
+                    System.out.println(this.species + " переместилось из локации [" + this.location.getCoordinates() + "] в локацию [" + newLocation.getCoordinates() + "] с скоростью " + this.speed);
                 } else {
-                    // Логирование ошибки
+
                     System.out.println(this.species + " не может переместиться. На локации [" + newLocation.getCoordinates() + "] слишком много животных этого вида или локация переполнена.");
                 }
             }
         } else {
-            System.out.println(this.species + " не переместилось. Случай выбрал оставаться.");
+            System.out.println(this.species + " не переместилось.");
         }
     }
 
-    // Метод для поиска новой локации для перемещения (соседние клетки)
-        private Location findNewLocation() {
-        // Список соседей (например, случайный сосед по вертикали или горизонтали)
-        int dx = ThreadLocalRandom.current().nextInt(0, Settings.columnsCount);
-        int dy = ThreadLocalRandom.current().nextInt(0, Settings.rowsCount);
+    private Location findNewLocation() {
+        int dx = ThreadLocalRandom.current().nextInt(-speed, speed + 1);
+        int dy = ThreadLocalRandom.current().nextInt(-speed, speed + 1);
 
-        // Возвращаем новую локацию (в данном примере просто случайно выбранную)
-        Location newLocation = this.location.getAdjacentLocation(dx, dy); // Метод получения соседней локации
+
+        Location newLocation = this.location.getAdjacentLocation(dx, dy);
+
         if (newLocation == null) {
             System.out.println("Не удалось найти соседнюю локацию для перемещения.");
         }
+
         return newLocation;
     }
 
-    // Дополнительные методы (getters, setters и т.д.)
+
+    // Метод, возвращающий скорость животного в зависимости от его вида
+    private int getSpeedForSpecies(String species) {
+        if (species == null) {
+            System.out.println("Ошибка: вид животного не задан");
+            return 0;
+        }
+
+        switch (species) {
+            case "Wolf": return Settings.maxWolfSpeed;
+            case "Fox": return Settings.maxFoxSpeed;
+            case "Eagle": return Settings.maxEagleSpeed;
+            case "Boa": return Settings.maxBoaSpeed;
+            case "Bear": return Settings.maxBearSpeed;
+            case "Sheep": return Settings.maxSheepSpeed;
+            case "Rabbit": return Settings.maxRabbitSpeed;
+            case "Mouse": return Settings.maxMouseSpeed;
+            case "Horse": return Settings.maxHorseSpeed;
+            case "Hog": return Settings.maxHogSpeed;
+            case "Goat": return Settings.maxGoatSpeed;
+            case "Duck": return Settings.maxDuckSpeed;
+            case "Deer": return Settings.maxDeerSpeed;
+            case "Caterpillar": return Settings.maxCaterpillarSpeed;
+            case "Buffalo": return Settings.maxBuffaloSpeed;
+            default: return 0; // Если не найден вид, то скорость 0
+        }
+    }
+
+
+    public int getSpeed() {
+        return this.speed;
+    }
+
+
+
     public String getSpecies() {
         return species;
     }
-    // Сеттер для species
+
     public void setSpecies(String species) {
         this.species = species;
     }
@@ -106,7 +141,7 @@ public abstract class Animal extends Creature implements Cloneable{
         this.location = location;
     }
 
-    // Метод клонирования животного (понадобится для создания копии)
+    // Метод клонирования животного
     @Override
     public Animal clone() {
         try {
