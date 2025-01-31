@@ -534,13 +534,13 @@ public class Location implements Runnable {
         try {
             System.out.println("Перемещение животных на локации [" + this.getCoordinates() + "]...");
 
-            // Перемещаем каждого животного на локации с учетом его скорости
+            // Перемещаем каждого животного на локации
             for (Animal animal : animals) {
                 if (animal.isAlive()) {
                     // Логируем передвижение животного
                     System.out.println("Животное с видом " + animal.getSpecies() + " на локации [" + this.getCoordinates() + "] перемещается...");
 
-                    // Перемещаем животное с учетом его скорости
+                    // Перемещаем животное
                     animal.move();
                 }
             }
@@ -548,7 +548,6 @@ public class Location implements Runnable {
             lock.unlock(); // Разблокируем ресурсы
         }
     }
-
 
 
 
