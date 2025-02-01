@@ -23,7 +23,7 @@ public abstract class Animal extends Creature implements Cloneable{
 
     boolean isAlive = true;
     protected ReentrantLock lock = new ReentrantLock();
-    protected ThreadLocalRandom random = ThreadLocalRandom.current();
+
 
 
     public Animal(double currentWeight,double currentSatiety){
@@ -118,10 +118,7 @@ public abstract class Animal extends Creature implements Cloneable{
         currentWeight-=0;
 
     }
-    public boolean isAlive(){
 
-        return isAlive;
-    }
 
 
 }

@@ -28,7 +28,6 @@ public class Location implements Runnable {
     Statistics statistics = new Statistics();
     private ReentrantLock lock = new ReentrantLock(); // Блокировка для потокобезопасности
     private List<Animal> variableAnimals;
-    private int maxAnimals;
     private int x, y;  // Координаты текущей локации в массиве
     private Island island;
 
@@ -204,7 +203,7 @@ public class Location implements Runnable {
 
     // Проверка: если в локации можно разместить животное
     public boolean canAddAnimal(Animal animal) {
-        // Проверяем, если локация не переполнена
+        // Проверка, если локация не переполнена
         return animals.size() < Settings.maxCountAnimals;
     }
 
@@ -223,7 +222,7 @@ public class Location implements Runnable {
 
 
 
-    public void growPlants() {
+    synchronized public void growPlants() {
         int currentPlantCount = plants.size();
         int maxPlants = Settings.maxPlantCount;
 
@@ -270,14 +269,14 @@ public class Location implements Runnable {
         while (iterator.hasNext()) {
             Animal beast = iterator.next();
             if(!(beast  instanceof Caterpillar)){
-                beast.decreaseSatiety(); // Уменьшаем сытость и вес
+                beast.decreaseSatiety(); // Уменьшение сытости и веса
             }
 
 
             // Условие смерти от голода
             if ((beast.getCurrentSatiety() <= 0 || beast.getCurrentWeight() < beast.getMaxWeight() * 0.5)&& !(beast  instanceof Caterpillar)){
                 System.out.println(beast.getClass().getSimpleName() + " погиб от истощения.");
-                animalsToRemove.add(beast); // Добавляем в список на удаление
+                animalsToRemove.add(beast); // Добавление в список на удаление
             } else {
                 if(!(beast  instanceof Caterpillar)) {
                     System.out.println("Животное: " + beast.getClass().getSimpleName() +
@@ -287,7 +286,7 @@ public class Location implements Runnable {
             }
         }
 
-        // Удаляем голодных животных после итерации
+        // Удаление умерших животных после итерации
         animals.removeAll(animalsToRemove);
 
 
@@ -298,7 +297,7 @@ public class Location implements Runnable {
         List<Animal> preyToRemove = new ArrayList<>();
         System.out.println("Началась охота!");
 
-        for (Animal predator : new ArrayList<>(animals)) { // Используем копию списка
+        for (Animal predator : new ArrayList<>(animals)) { // Используется копия списка
             if (predator instanceof Predator) {
                 // Если хищник уже переел — он не охотится и сразу умирает
                 if (((Predator) predator).isOverfed()) {
@@ -324,19 +323,19 @@ public class Location implements Runnable {
                                         " (вероятность " + probability + "%)");
                             }
 
-                            if (localRandom.nextInt(100) < probability && !((Predator) predator).isOverfed()) { // Проверяем вероятность охоты
+                            if (localRandom.nextInt(100) < probability && !((Predator) predator).isOverfed()) { // Проверка вероятности охоты
                                 predator.eat(prey); // Хищник ест жертву
 
                                 // Если хищник переел после еды, он умирает сразу
                                 if (((Predator) predator).isOverfed()) {
                                     System.out.println(predator.getClass().getSimpleName() + " переел и умер!");
                                     predatorsToRemove.add(predator);
-                                    break; // Выходим из цикла охоты для этого хищника
+                                    break; // Выход из цикла охоты для этого хищника
                                 }
 
-                                preyToRemove.add(prey); // Отмечаем жертву для удаления
+                                preyToRemove.add(prey); // жертва для удаления
                                 hunted = true;
-                                break; // Если хищник съел, выходим из охоты
+                                break; // Если хищник съел - выход из охоты
                             }
                         }
                     }
@@ -345,7 +344,7 @@ public class Location implements Runnable {
                         attemptCount++;
                     }
 
-                    // Если хищник съел за все попытки, выходим из цикла
+                    // Если хищник съел за все попытки, выход из цикла
                     if (attemptCount >= huntingAttempts) {
                         break;
                     }
@@ -363,18 +362,18 @@ public class Location implements Runnable {
     synchronized public void herbivorsEating() {
         List<Animal> toRemove = new ArrayList<>(); // Список животных, которых нужно удалить
 
-        for (Animal herbivore : new ArrayList<>(animals)) { // Создаём копию списка
+        for (Animal herbivore : new ArrayList<>(animals)) { // Копия списка
             if (herbivore instanceof Herbivor) {
                 boolean ateSomething = false;
 
-                // Если травоядное не голодное, пропускаем его
+                // Если травоядное не голодное- skip
                 if (herbivore.getCurrentSatiety() >= herbivore.getFullSatiety()) {
                     continue; // Животное сытое, оно не будет есть
                 }
 
                 // Генерируем случайное количество попыток поедания (от 1 до 5)
                 int maxEatingAttempts = 5;
-                int attempts = new Random().nextInt(maxEatingAttempts) + 1; // Количество попыток от 1 до 5
+                int attempts = localRandom.nextInt(maxEatingAttempts) + 1; // Количество попыток от 1 до 5
 
                 int attemptCount = 0;
 
@@ -394,17 +393,17 @@ public class Location implements Runnable {
                     int herbivoreAttempts = localRandom.nextInt(maxEatingAttempts) + 1; // Генерируем случайное количество попыток поедания других травоядных
 
                     for (int i = 0; i < herbivoreAttempts; i++) { // Попытки поедания других травоядных
-                        for (Animal prey : new ArrayList<>(animals)) { // Создаём копию списка животных
+                        for (Animal prey : new ArrayList<>(animals)) { // Копия списка животных
                             if (prey != herbivore && prey instanceof Herbivor) {
                                 int probability = Settings.getHerbivorProbability(herbivore.getClass(), prey.getClass());
                                 int chance = localRandom.nextInt(100) + 1; // Генерация числа от 1 до 100
 
                                 if (chance <= probability) {
                                     herbivore.eat(prey); // Поедание другого травоядного
-                                    toRemove.add(prey); // Добавляем жертву в список на удаление
+                                    toRemove.add(prey); // Добавление жертвы в список на удаление
                                     System.out.println(herbivore.getClass().getSimpleName() + " съел " + prey.getClass().getSimpleName() +
                                             " Текущий вес: " + herbivore.getCurrentWeight() + " Текущая сытость: " + herbivore.getCurrentSatiety());
-                                    break; // После удачного поедания прекращаем попытки съесть других травоядных
+                                    break; // После удачного поедания хватит есть других травоядных
                                 }
                             }
                         }
@@ -419,7 +418,7 @@ public class Location implements Runnable {
             }
         }
 
-        // Удаляем всех животных, которые были съедены или умерли
+        // Удаение всех животных, которые были съедены или умерли
         animals.removeAll(toRemove);
     }
 
@@ -428,27 +427,27 @@ public class Location implements Runnable {
         List<Animal> newAnimals = new ArrayList<>(); // Список для новых животных
         Set<Animal> alreadyReproduced = new HashSet<>(); // Множество уже размножившихся животных
 
-        // Храним количество животных каждого типа
+        // Количество животных каждого типа
         Map<Class<? extends Animal>, Integer> animalCounts = new HashMap<>();
         System.out.println("Размножение");
 
-        // Подсчитываем количество животных каждого типа
+        //Количество животных каждого типа
         for (Animal animal : animals) {
             animalCounts.put(animal.getClass(), animalCounts.getOrDefault(animal.getClass(), 0) + 1);
         }
 
-        // Проходим по каждому животному и пытаемся найти пару для размножения
+        // Поиск пары для размножения
         for (int i = 0; i < animals.size(); i++) {
             for (int j = i + 1; j < animals.size(); j++) {
                 Animal parent1 = animals.get(i);
                 Animal parent2 = animals.get(j);
 
-                // Если животные уже размножались, пропускаем их
+                // Если животные уже размножались -skip
                 if (alreadyReproduced.contains(parent1) || alreadyReproduced.contains(parent2)) {
                     continue;
                 }
 
-                // Проверяем, что оба животного одного типа
+                // Проверка, что оба животного одного типа
                 if (parent1.getClass().equals(parent2.getClass())) {
                     int maxCount = Settings.getMaxCount(parent1.getClass()); // Максимальное количество для данного типа
                     int currentCount = animalCounts.get(parent1.getClass()); // Текущее количество животных данного типа
@@ -481,7 +480,7 @@ public class Location implements Runnable {
                                     // Привязываем детеныша к текущей локации родителя
                                     child.setCurrentLocation(parent1.getCurrentLocation());
 
-                                    // Логируем создание нового животного
+
                                     System.out.println("Родился новый " + child.getClass().getSimpleName() +
                                             " | Вес: " + child.getCurrentWeight() +
                                             " | Сытость: " + child.getCurrentSatiety());
@@ -501,10 +500,10 @@ public class Location implements Runnable {
             }
         }
 
-        // Добавляем всех новых животных в основной список
+        // Добавление всех новых животных в основной список
         animals.addAll(newAnimals);
 
-        // Логируем завершение размножения
+
         System.out.println("Общее количество животных после размножения: ");
         for (Map.Entry<Class<? extends Animal>, Integer> entry : animalCounts.entrySet()) {
             System.out.println(entry.getKey().getSimpleName() + ": " + entry.getValue());
@@ -513,11 +512,11 @@ public class Location implements Runnable {
     }
 
     public void animalsMove() {
-        // Перебираем все животные в данной локации
-        List<Animal> animalsToMove = new ArrayList<>(animals);  // Делаем копию, чтобы избежать ошибок во время итерации
+
+        List<Animal> animalsToMove = new ArrayList<>(animals);  // Копия, чтобы избежать ошибок во время итерации
 
         for (Animal animal : animalsToMove) {
-            // Получаем вероятность перемещения для текущего животного
+            // Ввероятность перемещения для текущего животного
             int moveProbability = animal.getMoveProbability();
             double randomChance = Math.random() * 100;
 
@@ -525,9 +524,9 @@ public class Location implements Runnable {
 
             // Если шанс перемещения больше случайного числа, то животное перемещается
             if (randomChance <= moveProbability) {
-                List<Location> neighbors = getNeighboringLocations();  // Получаем соседей для текущей локации
+                List<Location> neighbors = getNeighboringLocations();  // Соседи для текущей локации
 
-                // Ищем свободного соседа
+                // Поиск свободного соседа
                 for (Location neighbor : neighbors) {
                     if (neighbor.canAddAnimal(animal)) {
                         // Перемещаем животное, создавая его клон на новой локации
@@ -535,11 +534,11 @@ public class Location implements Runnable {
                         Animal clonedAnimal = animal.clone();
                         neighbor.addAnimal(clonedAnimal);  // Добавляем клонированное животное
 
-                        // Получаем координаты новой локации
+                        // Координаты новой локации
                         int newX = neighbor.getX();
                         int newY = neighbor.getY();
 
-                        // Выводим информацию о перемещении, включая координаты
+
                         System.out.println(animal.getClass().getSimpleName() + " переместился в локацию с координатами [" + newX + ", " + newY + "] с шансом " +
                                 moveProbability + "%.");
                         break;
@@ -553,37 +552,37 @@ public class Location implements Runnable {
 
     // Метод для получения локации по координатам
     private Location getLocation(int x, int y) {
-        // Реализуйте механизм получения локации по координатам (например, через глобальный массив локаций)
-        return island.getLocationAt(x, y);  // Пример, что у вас может быть такая функция в классе Island
+
+        return island.getLocationAt(x, y);
     }
 
 
 
 
 
-
+    //Функция всего жизненного цикла
     public void animalAndPlantLifeCycle() {
 
-        growPlants();
+        growPlants();   //Рост растений
         System.out.println();
-        animalsSpawn();
+        animalsSpawn();     //Спавн животных
 
         System.out.println();
-        herbivorsEating();
+        herbivorsEating();      //Питание травоядных
         System.out.println();
-        lostSatiety();
+        lostSatiety();      //Потеря сытости
         System.out.println();
 
-        predatorHunting();
+        predatorHunting();      //Охота хищников
         System.out.println();
-        animalReproduce();
+        animalReproduce();  //Размножение
         System.out.println();
-        animalsMove();
+        animalsMove();      //Передвижение животных
         System.out.println("Прошел день жизни");
 
 
         // Вывод статистики
-        statistics.printDailyStatistics(getAnimals());
+        statistics.printDailyStatistics(getAnimals());  //Статистика
 
 
         System.out.println();

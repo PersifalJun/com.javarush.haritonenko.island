@@ -19,7 +19,7 @@ public class Settings {
 
     //Размер острова
     public final static int columnsCount = 4;           //Можно менять и ставить 100
-    public final static int rowsCount = 4;              //Можно менять и ставить 20 , но будет очень долгий вывод
+    public final static int rowsCount =  4;              //Можно менять и ставить 20 , но будет очень долгий вывод
 
     // Характеристики для растений на 1 локации
     public final static int maxPlantCount = 200;
@@ -147,7 +147,7 @@ public class Settings {
     public final static double BuffaloFullSatiety = 100;
 
 
-    //Кол-во детенышей у каждого животного - в доработке
+    //Кол-во детенышей у каждого животного
     public final static int maxWolfCubCount = 10;
     public final static int maxFoxCubCount = 10;
     public final static int maxEagleCubCount = 10;

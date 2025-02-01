@@ -21,16 +21,16 @@ public class Island {
         }
     }
 
-    // Метод для получения всех локаций
+
     public Location[][] getLocations() {
         return locations;
     }
 
-    // Метод для получения локации по индексу (если нужно)
+    // Метод для получения локации по индексу
     public Location getLocationAt(int x, int y) {
         if (x >= 0 && x < locations.length && y >= 0 && y < locations[0].length) {
             return locations[x][y];
         }
-        return null;  // Если индексы выходят за пределы массива
+        return null;
     }
 }

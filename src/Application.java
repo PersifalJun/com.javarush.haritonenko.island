@@ -15,7 +15,7 @@ public class Application {
         Location[][] location = island.getLocations(); // Инициализация массива локаций
 
         // Пул потоков с 4 потоками
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4);
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4); //4 потока - 4 ядра
 
         // Латч для ожидания завершения всех потоков
         CountDownLatch latch = new CountDownLatch(Settings.columnsCount * Settings.rowsCount);
@@ -23,10 +23,10 @@ public class Application {
         // Для корректного увеличения числа циклов
         AtomicInteger completedCycles = new AtomicInteger(0);
 
-        // Создаем ReentrantLock для обеспечения последовательности
+        // Создаем ReentrantLock для обеспечения потокобезопазности
         Lock lock = new ReentrantLock();
 
-        // Запуск обработки локаций по порядку (по одной каждую 3 секунды)
+        // Запуск обработки локаций
         for (int i = 0; i < Settings.columnsCount; i++) {
             for (int j = 0; j < Settings.rowsCount; j++) {
                 final int column = i;
@@ -37,7 +37,7 @@ public class Application {
 
                 Runnable locationTask = () -> {
                     try {
-                        lock.lock(); // Захват блокировки для последовательного выполнения задач
+                        lock.lock(); //  блокировка
 
                         int totalCycles = currentLocation.lifeCycles;
                         AtomicInteger localCompletedCycles = new AtomicInteger(0);
@@ -57,39 +57,38 @@ public class Application {
                         System.out.println("Локация [" + column + ", " + row + "] завершила " + localCompletedCycles.get() + " циклов.");
                         completedCycles.addAndGet(localCompletedCycles.get());
 
-                        // Уменьшаем латч, чтобы обозначить завершение задачи для этой локации
+                        // Уменьшение латча, чтобы обозначить завершение задачи для этой локации
                         latch.countDown();
 
-                        // Задержка 3 секунды перед выводом следующей локации
-                        Thread.sleep(3000); // Задержка 3 секунды (3000 миллисекунд)
+                        //
+                        Thread.sleep(3000); // Задержка 3 секунды  для каждой задачи
 
                     } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt(); // В случае прерывания потока
+                        Thread.currentThread().interrupt();
                     } finally {
-                        lock.unlock(); // Освобождаем блокировку
+                        lock.unlock(); //  разблокировано
                     }
                 };
 
-                // Запускаем задачу для текущей локации в пуле потоков
+                // Запуск задачи
                 ses.submit(locationTask);
             }
         }
 
         // Ожидание завершения всех задач
-        if (!latch.await(15, TimeUnit.SECONDS)) {
-            System.err.println("Некоторые задачи не успели завершиться вовремя");
-        }
+        latch.await(); //
 
-        // Завершаем работу пула потоков
+        // Завершение работы пула потоков
         ses.shutdown();
         // Проверка завершения всех задач
         if (!ses.awaitTermination(10, TimeUnit.SECONDS)) {
-            System.err.println("Некоторые задачи не завершились вовремя");
+            System.err.println("Некоторые задачи не завершились вовремя.");
         } else {
             System.out.println("Все задачи завершены.");
         }
 
-        // Итоговая статистика
+       
         System.out.println("Общее количество завершенных циклов для всех локаций: " + completedCycles.get());
     }
+
 }

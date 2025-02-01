@@ -56,26 +56,26 @@ public class Herbivor extends Animal {
             if (food instanceof Plant) {
                 double foodWeight = ((Plant) food).weight;
 
-                // Для травоядных увеличиваем сытость и вес медленнее
+                // Для травоядных увеличение сытости и веса происходит медленнее
                 if (this instanceof Rabbit || this instanceof Mouse) {
-                    // Для зайцев и мышей делаем коэффициенты меньше
-                    this.currentSatiety += foodWeight * 0.005; // Уменьшаем коэффициент
-                    this.currentWeight += foodWeight * 0.005; // Уменьшаем коэффициент
+                    // Для зайцев и мышей  коэффициенты меньше
+                    this.currentSatiety += foodWeight * 0.005;
+                    this.currentWeight += foodWeight * 0.005;
                 } else {
-                    // Для более крупных травоядных коэффициенты могут быть такими же, как раньше
+                    // Для более крупных травоядных
                     this.currentSatiety += foodWeight * 0.01;
                     this.currentWeight += foodWeight * 0.01;
                 }
 
-            } else if (food instanceof Herbivor) { // Теперь травоядное может есть других травоядных
+            } else if (food instanceof Herbivor) { // травоядное может есть других травоядных (согласно вероятности)
                 double foodWeight = ((Herbivor) food).currentWeight;
 
-                // Для зайцев и мышей тоже уменьшаем коэффициенты для еды травоядных
+
                 if (this instanceof Rabbit || this instanceof Mouse) {
-                    this.currentSatiety += foodWeight * 0.0005; // Уменьшаем коэффициент для травоядных
-                    this.currentWeight += foodWeight * 0.0005; // Уменьшаем коэффициент для травоядных
+                    this.currentSatiety += foodWeight * 0.0005;
+                    this.currentWeight += foodWeight * 0.0005;
                 } else {
-                    // Для более крупных травоядных коэффициенты могут быть стандартными
+
                     this.currentSatiety += foodWeight * 0.001;
                     this.currentWeight += foodWeight * 0.001;
                 }
@@ -96,10 +96,10 @@ public class Herbivor extends Animal {
         // Создаём потомка через фабричный метод
         HerbivorFactory herbivorFactory = new HerbivorFactory(0,0);
 
-        // Используем getClass() для получения текущего типа хищника
+
         Herbivor child = herbivorFactory.createHerbivor(this.getClass());
 
-        // Устанавливаем вес и сытость детеныша
+        // вес и сытость детеныша
         child.setCurrentWeight(this.getMaxWeight() / 2);
         child.setCurrentSatiety(this.getFullSatiety() / 2);
 
@@ -107,9 +107,6 @@ public class Herbivor extends Animal {
 
 
     }
-
-
-
 
 
 
@@ -124,6 +121,8 @@ public class Herbivor extends Animal {
         System.out.println(this.getClass().getSimpleName() + " потерял сытость: " + satietyLoss +
                 " | Потеря веса: " + weightLoss);
     }
+
+    //Скорость для каждого животного
     @Override
     public int getSpeed() {
         // Возвращаем скорость на основе конкретного вида животного
@@ -157,15 +156,15 @@ public class Herbivor extends Animal {
         List<Location> neighbors = currentLocation.getNeighboringLocations();
 
         for (Location neighbor : neighbors) {
-            // Проверяем, что локация не переполнена и может принять животное
+            // Проверка : локация не переполнена и может принять животное
             if (neighbor.canAddAnimal(this)) {
-                // Клонируем животное и добавляем в соседнюю локацию
+                // Клон животного и добавление в соседнюю локацию
                 Animal clonedAnimal = this.clone();
                 currentLocation.removeAnimal(this);
                 currentLocation = neighbor;
-                neighbor.addAnimal(clonedAnimal);  // Добавляем клонированное животное
+                neighbor.addAnimal(clonedAnimal);  // Добавление клонированного животного
 
-                // Выводим информацию о перемещении
+                // Вывод информации о перемещении
                 System.out.println(this.getClass().getSimpleName() + " переместился в соседнюю локацию с шансом " +
                         moveProbability + "%.");
                 break;

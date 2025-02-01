@@ -2,7 +2,7 @@ package repository;
 
 
 import config.Settings;
-import entity.creature.Creature;
+
 import entity.creature.animal.predator.Predator;
 import entity.creature.animal.predator.*;
 import java.util.Random;

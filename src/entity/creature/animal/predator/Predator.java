@@ -55,7 +55,7 @@ public class Predator extends Animal {
                 double satietyIncrease = foodWeight * 0.05;
                 double weightIncrease = foodWeight * 0.1;
 
-                // Увеличиваем насыщенность и вес
+                // Увеличение насыщенности и веса
                 this.currentSatiety += satietyIncrease;
                 this.currentWeight += weightIncrease;
 
@@ -84,10 +84,10 @@ public class Predator extends Animal {
         // Создаём потомка через фабричный метод
         PredatorFactory predatorFactory = new PredatorFactory(0,0);
 
-        // Используем getClass() для получения текущего типа хищника
+
         Predator child = predatorFactory.createPredator(this.getClass());
 
-        // Устанавливаем вес и сытость детеныша
+        //  вес и сытость детеныша
         child.setCurrentWeight(this.getMaxWeight() / 2);
         child.setCurrentSatiety(this.getFullSatiety() / 2);
 
@@ -106,9 +106,10 @@ public class Predator extends Animal {
         System.out.println(this.getClass().getSimpleName() + " потерял сытость: " + satietyLoss +
                 " | Потеря веса: " + weightLoss);
     }
+    //Скорость для каждого животного
     @Override
     public int getSpeed() {
-        // Возвращаем скорость на основе конкретного вида животного
+
         if (this instanceof Wolf) return Settings.maxWolfSpeed;
         if (this instanceof Fox) return Settings.maxFoxSpeed;
         if (this instanceof Eagle) return Settings.maxEagleSpeed;
