@@ -558,8 +558,6 @@ public class Location implements Runnable {
 
 
 
-
-
     //Функция всего жизненного цикла
     public void animalAndPlantLifeCycle() {
 
@@ -575,9 +573,9 @@ public class Location implements Runnable {
 
         predatorHunting();      //Охота хищников
         System.out.println();
-        animalReproduce();  //Размножение
+        animalReproduce();    //Размножение
         System.out.println();
-        animalsMove();//Передвижение животных
+        animalsMove();        //Передвижение животных
         System.out.println();
         System.out.println("Прошел день жизни");
 
