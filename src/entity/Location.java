@@ -577,7 +577,8 @@ public class Location implements Runnable {
         System.out.println();
         animalReproduce();  //Размножение
         System.out.println();
-        animalsMove();      //Передвижение животных
+        animalsMove();//Передвижение животных
+        System.out.println();
         System.out.println("Прошел день жизни");
 
 
