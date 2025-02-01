@@ -4,28 +4,33 @@ package entity;
 import config.Settings;
 
 public class Island {
-    private int columnsCount;
-    private int rowsCount;
-    private Location[][] locations;
+    private Location[][] locations; // Двумерный массив локаций
 
-    // Конструктор для задания размеров острова
+    // Конструктор для инициализации острова с количеством строк и столбцов
     public Island(int columnsCount, int rowsCount) {
-        this.columnsCount = columnsCount;
-        this.rowsCount = rowsCount;
+        // Инициализация массива локаций
         this.locations = new Location[columnsCount][rowsCount];
     }
 
-    // Метод для создания локаций
+    // Метод для создания локаций и их инициализации
     public void createLocations() {
-        for (int i = 0; i < columnsCount; i++) {
-            for (int j = 0; j < rowsCount; j++) {
-                locations[i][j] = new Location(i,j, Settings.capacity); // Инициализация каждой локации
+        for (int i = 0; i < Settings.columnsCount; i++) {
+            for (int j = 0; j < Settings.rowsCount; j++) {
+                locations[i][j] = new Location(i, j,this);  // Инициализация каждой локации
             }
         }
     }
 
-
+    // Метод для получения всех локаций
     public Location[][] getLocations() {
         return locations;
+    }
+
+    // Метод для получения локации по индексу (если нужно)
+    public Location getLocationAt(int x, int y) {
+        if (x >= 0 && x < locations.length && y >= 0 && y < locations[0].length) {
+            return locations[x][y];
+        }
+        return null;  // Если индексы выходят за пределы массива
     }
 }

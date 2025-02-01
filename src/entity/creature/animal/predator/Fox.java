@@ -10,7 +10,7 @@ public class Fox extends Predator{
 
     public Fox(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
-        setSpecies("Fox");
+
     }
     @Override
     public double getMaxWeight(){

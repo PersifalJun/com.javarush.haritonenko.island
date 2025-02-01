@@ -8,6 +8,7 @@ import entity.creature.animal.Animal;
 import entity.creature.plant.Plant;
 import repository.HerbivorFactory;
 
+import java.util.List;
 
 
 public class Herbivor extends Animal {
@@ -123,7 +124,58 @@ public class Herbivor extends Animal {
         System.out.println(this.getClass().getSimpleName() + " потерял сытость: " + satietyLoss +
                 " | Потеря веса: " + weightLoss);
     }
+    @Override
+    public int getSpeed() {
+        // Возвращаем скорость на основе конкретного вида животного
+        if (this instanceof Buffalo) return Settings.maxBuffaloSpeed;
+        if (this instanceof Caterpillar) return Settings.maxCaterpillarSpeed;
+        if (this instanceof Deer) return Settings.maxDeerSpeed;
+        if (this instanceof Duck) return Settings.maxDuckSpeed;
+        if (this instanceof Goat) return Settings.maxGoatSpeed;
+        if (this instanceof Hog) return Settings.maxHogSpeed;
+        if (this instanceof Horse) return Settings.maxHorseSpeed;
+        if (this instanceof Mouse) return Settings.maxMouseSpeed;
+        if (this instanceof Rabbit) return Settings.maxRabbitSpeed;
+        if (this instanceof Sheep) return Settings.maxSheepSpeed;
+        return 0; // Если вид не найден, возвращаем 0
+    }
 
+    @Override
+    public String getSpecies() {
+        return "Herbivor";
+    }
+
+    @Override
+    public void move(Location[][] locations, int x, int y) {
+        int moveProbability = getMoveProbability();
+
+        // Генерация случайного числа для вероятности перемещения
+        if (Math.random() * 100 > moveProbability) {
+            return; // Если травоядное не перемещается
+        }
+
+        List<Location> neighbors = currentLocation.getNeighboringLocations();
+
+        for (Location neighbor : neighbors) {
+            // Проверяем, что локация не переполнена и может принять животное
+            if (neighbor.canAddAnimal(this)) {
+                // Клонируем животное и добавляем в соседнюю локацию
+                Animal clonedAnimal = this.clone();
+                currentLocation.removeAnimal(this);
+                currentLocation = neighbor;
+                neighbor.addAnimal(clonedAnimal);  // Добавляем клонированное животное
+
+                // Выводим информацию о перемещении
+                System.out.println(this.getClass().getSimpleName() + " переместился в соседнюю локацию с шансом " +
+                        moveProbability + "%.");
+                break;
+            }
+        }
+    }
+    @Override
+    public int getMoveProbability() {
+        return getSpeed() * 10; // Скорость * 10, например, для скорости 2 вероятность 20%
+    }
 
 
 }

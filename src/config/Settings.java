@@ -11,15 +11,15 @@ import java.util.Map;
 
 public class Settings {
 
-    public final static int lifeCycles = 2; //Кол-во циклов
+    public final static int lifeCycles = 5; //Кол-во циклов
 
     public int getLifeCycles() {
         return lifeCycles;
     }
 
     //Размер острова
-    public final static int columnsCount = 2;           //Можно менять и ставить 100
-    public final static int rowsCount = 2;              //Можно менять и ставить 20 , но будет очень долгий вывод
+    public final static int columnsCount = 4;           //Можно менять и ставить 100
+    public final static int rowsCount = 4;              //Можно менять и ставить 20 , но будет очень долгий вывод
 
     // Характеристики для растений на 1 локации
     public final static int maxPlantCount = 200;
@@ -40,7 +40,7 @@ public class Settings {
     public final static int maxGoatCount = 140;
     public final static int maxDuckCount = 200;
     public final static int maxDeerCount = 20;
-    public final static int maxCaterpillarCount = 50; // Вообще их 1000 но в консоли очень много выводится;
+    public final static int maxCaterpillarCount = 10; // Вообще их 1000 но в консоли очень много выводится;
     public final static int maxBuffaloCount = 10;
 
 

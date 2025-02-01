@@ -14,7 +14,7 @@ public class Rabbit extends Herbivor  {
 
     public Rabbit(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
-        setSpecies("Rabbit");
+
     }
     @Override
     public double getMaxWeight(){

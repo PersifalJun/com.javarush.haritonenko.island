@@ -12,7 +12,7 @@ public class Buffalo extends Herbivor {
 
     public Buffalo(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
-        setSpecies("Buffalo");
+
     }
 
     @Override

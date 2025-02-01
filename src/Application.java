@@ -2,28 +2,29 @@ import config.Settings;
 import entity.Island;
 import entity.Location;
 
-
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Application {
 
     public static void main(String[] args) throws InterruptedException {
-
         Island island = new Island(Settings.columnsCount, Settings.rowsCount); // остров
+        island.createLocations(); // Создание локаций
+        Location[][] location = island.getLocations(); // Инициализация массива локаций
 
-        island.createLocations(); //Создаие локаций
-        Location[][] location1 = island.getLocations(); // Инициализация массива локаций
-
-
-        // Пул потоков
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4); // 4 ядра
+        // Пул потоков с 4 потоками
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(4);
 
         // Латч для ожидания завершения всех потоков
         CountDownLatch latch = new CountDownLatch(Settings.columnsCount * Settings.rowsCount);
 
-        // Для корректного увеличения цисла циклов
+        // Для корректного увеличения числа циклов
         AtomicInteger completedCycles = new AtomicInteger(0);
+
+        // Создаем ReentrantLock для обеспечения последовательности
+        Lock lock = new ReentrantLock();
 
         // Запуск обработки локаций по порядку (по одной каждую 3 секунды)
         for (int i = 0; i < Settings.columnsCount; i++) {
@@ -32,57 +33,44 @@ public class Application {
                 final int row = j;
 
                 // Локация для текущего потока
-                final Location location = location1[i][j];
-
+                final Location currentLocation = location[i][j];
 
                 Runnable locationTask = () -> {
                     try {
-                        int totalCycles = location.lifeCycles; // Получаем количество циклов из настроек локации
-                        AtomicInteger localCompletedCycles = new AtomicInteger(0);
+                        lock.lock(); // Захват блокировки для последовательного выполнения задач
 
-                        System.out.println("Запуск циклов для локации [" + column + ", " + row + "] с " + totalCycles + " циклами.");
+                        int totalCycles = currentLocation.lifeCycles;
+                        AtomicInteger localCompletedCycles = new AtomicInteger(0);
 
                         // Выполнение жизненного цикла для локации
                         for (int cycle = 0; cycle < totalCycles; cycle++) {
-                            System.out.println("Цикл " + cycle + " для локации [" + column + ", " + row + "]...");
-
-                            // Проводим цикл только если есть живые животные
-                            if (!location.getAnimals().isEmpty()) {
-                                // Проверка, все ли животные мертвы
-                                boolean allDead = location.getAnimals().stream().allMatch(animal -> !animal.isAlive());
-
-                                if (allDead) {
-                                    // Если все животные мертвы, останавливаем программу
-                                    System.out.println("Все животные на локации [" + column + ", " + row + "] мертвы. Завершаем выполнение программы.");
-                                    System.out.println("Общее количество завершенных циклов: " + completedCycles.get());
-
-                                }
-
-                                location.run();  // Выполнение всех действий для животных в локации
+                            if (!currentLocation.getAnimals().isEmpty()) {
+                                currentLocation.run(); // Запуск жизненного цикла
                                 localCompletedCycles.incrementAndGet();
-                                System.out.println("Цикл " + cycle + " завершен.");
                             } else {
-                                break; // Если локация пуста, завершаем выполнение циклов
+                                System.out.println("Локация [" + column + ", " + row + "] пуста.");
+                                break; // Прерывание, если в локации нет животных
                             }
                         }
 
-                        // Результат для текущей локации, только если были выполнены циклы с живыми животными
-                        if (localCompletedCycles.get() > 0) {
-                            System.out.println("Локация [" + column + ", " + row + "] завершила " + localCompletedCycles.get() + " циклов.");
-                            completedCycles.addAndGet(localCompletedCycles.get());
-                        }
+                        // Вывод результата для текущей локации
+                        System.out.println("Локация [" + column + ", " + row + "] завершила " + localCompletedCycles.get() + " циклов.");
+                        completedCycles.addAndGet(localCompletedCycles.get());
 
-                        // Уменьшаем латч, обозначая завершение задачи для этой локации
+                        // Уменьшаем латч, чтобы обозначить завершение задачи для этой локации
                         latch.countDown();
 
-                        // Задержка перед выводом следующей локации (можно исключить если не требуется)
-                        Thread.sleep(3000);
+                        // Задержка 3 секунды перед выводом следующей локации
+                        Thread.sleep(3000); // Задержка 3 секунды (3000 миллисекунд)
+
                     } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                        Thread.currentThread().interrupt(); // В случае прерывания потока
+                    } finally {
+                        lock.unlock(); // Освобождаем блокировку
                     }
                 };
 
-                // Запускаем задачу для текущей локации в последовательном потоке
+                // Запускаем задачу для текущей локации в пуле потоков
                 ses.submit(locationTask);
             }
         }
@@ -94,7 +82,6 @@ public class Application {
 
         // Завершаем работу пула потоков
         ses.shutdown();
-
         // Проверка завершения всех задач
         if (!ses.awaitTermination(10, TimeUnit.SECONDS)) {
             System.err.println("Некоторые задачи не завершились вовремя");

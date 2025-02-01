@@ -6,6 +6,7 @@ import entity.Location;
 import entity.creature.Creature;
 import entity.creature.animal.Animal;
 import entity.creature.animal.herbivor.*;
+import java.util.List;
 import repository.PredatorFactory;
 
 
@@ -104,6 +105,53 @@ public class Predator extends Animal {
 
         System.out.println(this.getClass().getSimpleName() + " потерял сытость: " + satietyLoss +
                 " | Потеря веса: " + weightLoss);
+    }
+    @Override
+    public int getSpeed() {
+        // Возвращаем скорость на основе конкретного вида животного
+        if (this instanceof Wolf) return Settings.maxWolfSpeed;
+        if (this instanceof Fox) return Settings.maxFoxSpeed;
+        if (this instanceof Eagle) return Settings.maxEagleSpeed;
+        if (this instanceof Boa) return Settings.maxBoaSpeed;
+        if (this instanceof Bear) return Settings.maxBearSpeed;
+        return 0; // Если вид не найден, возвращаем 0
+    }
+
+    @Override
+    public String getSpecies() {
+        return "Predator";
+    }
+
+    @Override
+    public void move(Location[][] locations, int x, int y) {
+        int moveProbability = getMoveProbability();
+
+        // Генерация случайного числа для вероятности перемещения
+        if (Math.random() * 100 > moveProbability) {
+            return; // Если хищник не перемещается
+        }
+
+        List<Location> neighbors = currentLocation.getNeighboringLocations();
+
+        for (Location neighbor : neighbors) {
+            // Проверяем, что локация не переполнена и может принять животное
+            if (neighbor.canAddAnimal(this)) {
+                // Клонируем животное и добавляем в соседнюю локацию
+                Animal clonedAnimal = this.clone();
+                currentLocation.removeAnimal(this);
+                currentLocation = neighbor;
+                neighbor.addAnimal(clonedAnimal);  // Добавляем клонированное животное
+
+                // Выводим информацию о перемещении
+                System.out.println(this.getClass().getSimpleName() + " переместился в соседнюю локацию с шансом " +
+                        moveProbability + "%.");
+                break;
+            }
+        }
+    }
+    @Override
+    public int getMoveProbability() {
+        return getSpeed() * 10; // Скорость * 10, например, для скорости 3 вероятность 30%
     }
 }
 

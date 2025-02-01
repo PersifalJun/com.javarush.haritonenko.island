@@ -13,7 +13,7 @@ public class Caterpillar extends Herbivor {
     public Caterpillar(double currentWeight,double currentSatiety) {
 
         super(currentWeight,currentSatiety);
-        setSpecies("Caterpillar");
+
     }
 
     @Override

@@ -27,13 +27,24 @@ public class Location implements Runnable {
     public static int lifeCycles = settings.getLifeCycles();
     Statistics statistics = new Statistics();
     private ReentrantLock lock = new ReentrantLock(); // Блокировка для потокобезопасности
-    private int capacity; // Вместимость локации
-    private int x, y; // Координаты локации
+    private List<Animal> variableAnimals;
+    private int maxAnimals;
+    private int x, y;  // Координаты текущей локации в массиве
+    private Island island;
 
-    public Location(int x,int y, int capacity) {
-        this.x=x;
-        this.y=y;
-        this.capacity = capacity;
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+    public Location(int x, int y, Island island) {
+
+        this.x = x;
+        this.y = y;
+        this.island = island;
+        this.variableAnimals = new ArrayList<>();
 
         //Хищники
         Wolf[] wolves = new Wolf[Settings.maxWolfCount];
@@ -166,68 +177,40 @@ public class Location implements Runnable {
 
         }
 
-
-
     }
+    // Метод для добавления животного в локацию
+    public void addAnimal(Animal animal) {
+        animals.add(animal);
+        animal.setCurrentLocation(this);  // Устанавливаем местоположение для животного
 
-    public void addAnimal(Animal clonedAnimal) {
-        lock.lock();
-        try {
-            System.out.println("До добавления животного. Количество животных: " + animals.size());
-
-            if (animals.size() < capacity || capacity == 0) {
-                animals.add(clonedAnimal);
-                clonedAnimal.setLocation(this); // Устанавливаем локацию для животного
-
-                System.out.println("После добавления животного. Количество животных: " + animals.size());
-
-                // Обновление статистики
-                statistics.updateAnimals(animals);
-            } else {
-                System.out.println("Локация переполнена.");
-            }
-        } finally {
-            lock.unlock();
-        }
     }
 
     public void removeAnimal(Animal animal) {
-        lock.lock();
-        try {
-            System.out.println("До удаления животного. Количество животных: " + animals.size());
-
-            if (animals.remove(animal)) {
-                statistics.updateAnimals(animals); // Обновляем статистику
-            } else {
-                System.out.println("Животное не найдено.");
-            }
-
-            System.out.println("После удаления животного. Количество животных: " + animals.size());
-        } finally {
-            lock.unlock();
-        }
-    }
-    // Метод для получения вместимости
-    public int getCapacity() {
-        return capacity;
+        animals.remove(animal);
     }
 
-    // Метод для получения максимального количества животных одного вида
-    public int getMaxSpeciesCount(String species) {
-        // Примерное количество животных одного вида на локации
-        return 5; // Можно менять в зависимости от вида и типа локации
+    // Получить соседей для текущей локации (по координатам)
+    public List<Location> getNeighboringLocations() {
+        List<Location> neighbors = new ArrayList<>();
+
+        // Соседние локации: сверху, снизу, слева, справа
+        if (x > 0) neighbors.add(getLocation(x - 1, y)); // Слева
+        if (x < Settings.columnsCount - 1) neighbors.add(getLocation(x + 1, y)); // Справа
+        if (y > 0) neighbors.add(getLocation(x, y - 1)); // Сверху
+        if (y < Settings.rowsCount - 1) neighbors.add(getLocation(x, y + 1)); // Снизу
+
+        return neighbors;
     }
 
-    // Метод для получения соседней локации
-    public Location getAdjacentLocation(int dx, int dy) {
-        // Например, просто создаем новую локацию с изменением координат
-        return new Location(this.x + dx, this.y + dy,capacity);
+    // Проверка: если в локации можно разместить животное
+    public boolean canAddAnimal(Animal animal) {
+        // Проверяем, если локация не переполнена
+        return animals.size() < Settings.maxCountAnimals;
     }
 
-    // Дополнительные методы
-    public String getCoordinates() {
-        return "[" + x + ", " + y + "]";
-    }
+
+
+
 
     public List<Animal> getAnimals() {
         return animals;
@@ -496,7 +479,7 @@ public class Location implements Runnable {
                                     alreadyReproduced.add(parent1); // Помечаем родителей как размножившихся
                                     alreadyReproduced.add(parent2);
                                     // Привязываем детеныша к текущей локации родителя
-                                    child.setLocation(parent1.getLocation());
+                                    child.setCurrentLocation(parent1.getCurrentLocation());
 
                                     // Логируем создание нового животного
                                     System.out.println("Родился новый " + child.getClass().getSimpleName() +
@@ -530,24 +513,50 @@ public class Location implements Runnable {
     }
 
     public void animalsMove() {
-        lock.lock(); // Блокируем ресурсы для синхронизации
-        try {
-            System.out.println("Перемещение животных на локации [" + this.getCoordinates() + "]...");
+        // Перебираем все животные в данной локации
+        List<Animal> animalsToMove = new ArrayList<>(animals);  // Делаем копию, чтобы избежать ошибок во время итерации
 
-            // Перемещаем каждого животного на локации
-            for (Animal animal : animals) {
-                if (animal.isAlive()) {
-                    // Логируем передвижение животного
-                    System.out.println("Животное с видом " + animal.getSpecies() + " на локации [" + this.getCoordinates() + "] перемещается...");
+        for (Animal animal : animalsToMove) {
+            // Получаем вероятность перемещения для текущего животного
+            int moveProbability = animal.getMoveProbability();
+            double randomChance = Math.random() * 100;
 
-                    // Перемещаем животное
-                    animal.move();
+            System.out.println(animal.getClass().getSimpleName() + " (" + animal.getSpecies() + ") имеет шанс перемещения: " + moveProbability + "%");
+
+            // Если шанс перемещения больше случайного числа, то животное перемещается
+            if (randomChance <= moveProbability) {
+                List<Location> neighbors = getNeighboringLocations();  // Получаем соседей для текущей локации
+
+                // Ищем свободного соседа
+                for (Location neighbor : neighbors) {
+                    if (neighbor.canAddAnimal(animal)) {
+                        // Перемещаем животное, создавая его клон на новой локации
+                        removeAnimal(animal);
+                        Animal clonedAnimal = animal.clone();
+                        neighbor.addAnimal(clonedAnimal);  // Добавляем клонированное животное
+
+                        // Получаем координаты новой локации
+                        int newX = neighbor.getX();
+                        int newY = neighbor.getY();
+
+                        // Выводим информацию о перемещении, включая координаты
+                        System.out.println(animal.getClass().getSimpleName() + " переместился в локацию с координатами [" + newX + ", " + newY + "] с шансом " +
+                                moveProbability + "%.");
+                        break;
+                    }
                 }
+            } else {
+                System.out.println(animal.getClass().getSimpleName() + " не переместился.");
             }
-        } finally {
-            lock.unlock(); // Разблокируем ресурсы
         }
     }
+
+    // Метод для получения локации по координатам
+    private Location getLocation(int x, int y) {
+        // Реализуйте механизм получения локации по координатам (например, через глобальный массив локаций)
+        return island.getLocationAt(x, y);  // Пример, что у вас может быть такая функция в классе Island
+    }
+
 
 
 

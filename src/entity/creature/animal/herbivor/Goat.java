@@ -13,7 +13,7 @@ public class Goat extends Herbivor {
 
     public Goat(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
-        setSpecies("Goat");
+
     }
 
     @Override

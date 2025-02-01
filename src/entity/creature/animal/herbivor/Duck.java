@@ -13,7 +13,7 @@ public class Duck extends Herbivor  {
 
     public Duck(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
-        setSpecies("Duck");
+
     }
     @Override
     public double getMaxWeight(){

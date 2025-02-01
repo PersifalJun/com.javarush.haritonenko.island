@@ -11,7 +11,7 @@ public class Bear extends Predator{
 
     public Bear(double currentWeight,double currentSatiety) {
         super(currentWeight,currentSatiety);
-        setSpecies("Bear");
+
     }
 
     @Override
